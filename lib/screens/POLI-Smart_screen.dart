@@ -5,38 +5,36 @@ class PoliSmartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('POLI-Smart'), // Nombre de la aplicación
+        backgroundColor: const Color(0xFF0F2440),
+        title: const Text('POLI-Smart'),
         actions: [
-          // Botón de búsqueda
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // Implementa la lógica para abrir el panel de búsqueda
-              // Puedes utilizar un showModalBottomSheet o Navigator para navegar a una pantalla de búsqueda.
+              // Agregar aquí la lógica para la búsqueda.
             },
           ),
-          // Botón de agregar
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              // Implementa la lógica para abrir la pantalla de agregar
-              // Puedes utilizar Navigator para navegar a la pantalla correspondiente.
+              // Agregar aquí la lógica para navegar a otra pantalla.
             },
           ),
         ],
       ),
       body: const Center(
         child: Text(
-            'Contenido de la pantalla'), // Puedes agregar el contenido de tu pantalla aquí
+          'Contenido de la pantalla POLI-Smart',
+          style: TextStyle(fontSize: 24, color: Colors.black),
+        ),
       ),
       drawer: Drawer(
-        // Menú desplegable
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Color(0xFF0F2440),
               ),
               child: Text(
                 'Menú',
@@ -47,20 +45,18 @@ class PoliSmartScreen extends StatelessWidget {
               ),
             ),
             ListTile(
-              title: const Text('Pantalla 1'), // Nombre de la pantalla 1
+              title: const Text('Opción 1'),
               onTap: () {
-                // Implementa la lógica para navegar a la pantalla 1
-                // Puedes utilizar Navigator para navegar.
+                // Agregar aquí la lógica para la opción 1.
               },
             ),
             ListTile(
-              title: const Text('Pantalla 2'), // Nombre de la pantalla 2
+              title: const Text('Opción 2'),
               onTap: () {
-                // Implementa la lógica para navegar a la pantalla 2
-                // Puedes utilizar Navigator para navegar.
+                // Agregar aquí la lógica para la opción 2.
               },
             ),
-            // Agrega más elementos de menú según sea necesario
+            // Agregar más elementos de menú según sea necesario.
           ],
         ),
       ),
