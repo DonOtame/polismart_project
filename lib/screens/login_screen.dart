@@ -43,15 +43,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       key: _scaffoldKey, // Clave para el ScaffoldMessenger
-      appBar: AppBar(
-        title: const Text('Iniciar sesión'),
-        backgroundColor:
-            const Color(0xFF0F2440), // Color de fondo de la barra de navegación
-      ),
       body: ListView(
         // Cambiamos SingleChildScrollView por ListView
         children: [
-          const SizedBox(height: 40.0), // Espacio arriba de la imagen
+          const SizedBox(height: 20.0), // Espacio arriba de la imagen
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Image.network(
