@@ -5,6 +5,7 @@ import 'package:polismart_project/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/login_screen.dart';
+import 'screens/POLI-Smart_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: LoginScreen(),
+        home: PoliSmartScreen(),
       ),
     );
   }
