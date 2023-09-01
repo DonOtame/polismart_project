@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "124882373769",
+    "project_id": "polismart-6f6ee",
+    "storage_bucket": "polismart-6f6ee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:124882373769:android:c6a67f13fe5a133d2d4a58",
+        "android_client_info": {
+          "package_name": "com.example.polismart_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "124882373769-d6paaaufc6lalhfaq8bir6s283tod4b8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOMIUmX8JAx2HzL72ldpVSV8cOXXPdKWU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "124882373769-d6paaaufc6lalhfaq8bir6s283tod4b8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
