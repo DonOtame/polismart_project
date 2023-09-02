@@ -4,12 +4,6 @@ import 'package:polismart_project/widgets/color_picker.dart';
 import 'package:polismart_project/widgets/horario_input.dart';
 import 'package:polismart_project/providers/materia_provider.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: IngresoMateriaScreen(),
-  ));
-}
-
 class IngresoMateriaScreen extends StatefulWidget {
   @override
   _IngresoMateriaScreenState createState() => _IngresoMateriaScreenState();
