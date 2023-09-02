@@ -107,16 +107,16 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
           await MateriaProvider().agregarMateria(materia);
 
           // Limpia los controladores después de guardar la materia
-          // nombreController.clear();
-          // profesorController.clear();
-          // aulaController.clear();
-          // setState(
-          //   () {
-          //     selectedDay = null;
-          //     selectedStartTime = null;
-          //     selectedEndTime = null;
-          //   },
-          // );
+          nombreController.clear();
+          profesorController.clear();
+          aulaController.clear();
+          setState(
+            () {
+              selectedDay = null;
+              selectedStartTime = null;
+              selectedEndTime = null;
+            },
+          );
         },
         foregroundColor: const Color(0xFFD9CE9A),
         child: const Icon(Icons.save),
