@@ -30,7 +30,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Polismart Project',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+              .copyWith(background: Color(0xFF0F2440)),
+          buttonTheme: ButtonThemeData(buttonColor: Color(0xFF0F2440)),
         ),
         home: LoginScreen(),
         //home: PoliSmartScreen(),
