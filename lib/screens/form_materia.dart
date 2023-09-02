@@ -1,30 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:polismart_project/models/materia.dart';
+import 'package:polismart_project/services/firebase_service.dart'; // Importa el proveedor de Materia
 
 class FormIngresomateria extends StatelessWidget {
-  const FormIngresomateria({super.key});
+  const FormIngresomateria({Key? key}); // Corrige el constructor
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          actions: const [
-            IconButton(
-              onPressed: null,
-              icon: Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
+      appBar: AppBar(
+        actions: [
+          const IconButton(
+            onPressed: null,
+            icon: Icon(
+              Icons.search,
+              color: Colors.white,
             ),
-            IconButton(
-                onPressed: null,
-                icon: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ))
-          ],
-          title: Text('Poli-Smart'),
-        ),
-        body: MateriasForm());
+          ),
+          IconButton(
+            onPressed: () {
+              // Navega a la pantalla de ingreso de materia cuando se presiona el botón de agregar.
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MateriasForm(),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+          ),
+        ],
+        title: const Text('Poli-Smart'),
+      ),
+      body: const Center(
+        child: Text('Contenido de la pantalla principal aquí'),
+      ),
+    );
   }
 }
 
@@ -50,7 +63,8 @@ class _MateriasFormState extends State<MateriasForm> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
-              decoration: InputDecoration(labelText: 'Nombre del Profesor'),
+              decoration:
+                  const InputDecoration(labelText: 'Nombre del Profesor'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Por favor ingresa el nombre del profesor.';
@@ -62,7 +76,7 @@ class _MateriasFormState extends State<MateriasForm> {
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Aula'),
+              decoration: const InputDecoration(labelText: 'Aula'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Por favor ingresa el número de aula.';
@@ -74,7 +88,8 @@ class _MateriasFormState extends State<MateriasForm> {
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Nombre de la Materia'),
+              decoration:
+                  const InputDecoration(labelText: 'Nombre de la Materia'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Por favor ingresa el nombre de la materia.';
@@ -87,7 +102,7 @@ class _MateriasFormState extends State<MateriasForm> {
             ),
             TextFormField(
               decoration:
-                  InputDecoration(labelText: 'Días de Clase y Horarios'),
+                  const InputDecoration(labelText: 'Días de Clase y Horarios'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Por favor ingresa los días de clase y horarios.';
@@ -98,20 +113,38 @@ class _MateriasFormState extends State<MateriasForm> {
                 diasDeClase = value!;
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  // Aquí puedes guardar la información en una base de datos o realizar otras acciones con los datos ingresados.
-                  // Por ejemplo, puedes imprimirlos en la consola.
-                  print('Nombre del Profesor: $profesor');
-                  print('Aula: $aula');
-                  print('Nombre de la Materia: $materia');
-                  print('Días de Clase y Horarios: $diasDeClase');
+
+                  // Crea un objeto Materia con los datos ingresados.
+                  final nuevaMateria = Materia(
+                    nombre: materia,
+                    color:
+                        'color_por_defecto', // Debes proporcionar un color por defecto
+                    profesor: profesor,
+                    aula: aula,
+                    horarios: [
+                      Horario(
+                        diaSemana:
+                            'Lunes', // Debes obtener los días de clase y horarios de manera adecuada
+                        horaInicio:
+                            '09:00', // Por ejemplo, desde los TextFormField
+                        horaFin: '10:30',
+                      ),
+                    ],
+                  );
+
+                  // Llama a la función para agregar la materia al proveedor.
+                  await materiaProvider.agregarMateria(nuevaMateria);
+
+                  // Una vez que se guarda la materia, puedes navegar de regreso a la pantalla principal.
+                  Navigator.pop(context);
                 }
               },
-              child: Text('Guardar'),
+              child: const Text('Guardar'),
             ),
           ],
         ),
