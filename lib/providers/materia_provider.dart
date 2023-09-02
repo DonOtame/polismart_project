@@ -6,6 +6,18 @@ class MateriaProvider {
       FirebaseFirestore.instance.collection('materias');
 
   Future<void> agregarMateria(Materia materia) async {
+    // Validar que los campos no estén vacíos o nulos
+    if (materia.nombre.isEmpty ||
+        materia.color.isEmpty ||
+        materia.profesor.isEmpty ||
+        materia.aula.isEmpty ||
+        materia.horario.diaSemana.isEmpty ||
+        materia.horario.horaInicio.isEmpty ||
+        materia.horario.horaFin.isEmpty) {
+      throw Exception('Todos los campos deben estar llenos');
+    }
+
+    // Si pasa las validaciones, guardar la materia en Firebase Firestore
     await materiasCollection.doc(materia.nombre).set({
       'nombre': materia.nombre,
       'color': materia.color,

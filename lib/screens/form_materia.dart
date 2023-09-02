@@ -15,6 +15,7 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
   TextEditingController nombreController = TextEditingController();
   TextEditingController profesorController = TextEditingController();
   TextEditingController aulaController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String? selectedDay;
   TimeOfDay? selectedStartTime;
@@ -23,6 +24,7 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text(
           'Ingresar Materia',
@@ -87,36 +89,50 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Crea un objeto Horario con los valores seleccionados
           final horario = Horario(
-            diaSemana: selectedDay ?? "NO",
-            horaInicio: selectedStartTime?.format(context) ?? "NO",
-            horaFin: selectedEndTime?.format(context) ?? "NO",
+            diaSemana: selectedDay ?? "",
+            horaInicio: selectedStartTime?.format(context) ?? "",
+            horaFin: selectedEndTime?.format(context) ?? "",
           );
 
-          // Crea un objeto Materia con los datos del formulario
           final materia = Materia(
             nombre: nombreController.text,
-            color: selectedColor.toString(), // Convierte el color en una cadena
+            color: selectedColor.toString(),
             profesor: profesorController.text,
             aula: aulaController.text,
-            horario: horario, // Asigna el horario creado
+            horario: horario,
           );
 
-          // Llama al método para agregar la materia a Firebase Firestore
-          await MateriaProvider().agregarMateria(materia);
-
-          // Limpia los controladores después de guardar la materia
-          nombreController.clear();
-          profesorController.clear();
-          aulaController.clear();
-          setState(
-            () {
+          try {
+            await MateriaProvider().agregarMateria(materia);
+            nombreController.clear();
+            profesorController.clear();
+            aulaController.clear();
+            setState(() {
               selectedDay = null;
               selectedStartTime = null;
               selectedEndTime = null;
-            },
-          );
+            });
+
+            // Muestra un SnackBar de éxito aquí
+            final snackBar = SnackBar(
+              content: Text('Materia guardada con éxito'),
+              backgroundColor: Colors.green,
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+            // Cierra el screen después de un tiempo
+            Future.delayed(Duration(seconds: 2), () {
+              Navigator.of(context).pop(); // Cierra el screen
+            });
+          } catch (error) {
+            // Muestra un SnackBar de error en caso de fallo
+            final snackBar = SnackBar(
+              content: Text("Error al guardar la materia: $error"),
+              backgroundColor: Colors.red,
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
         },
         foregroundColor: const Color(0xFFD9CE9A),
         child: const Icon(Icons.save),
