@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:polismart_project/models/materia.dart';
+import 'package:polismart_project/widgets/color_picker.dart';
+import 'package:polismart_project/widgets/horario_input.dart';
+import 'package:polismart_project/providers/materia_provider.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: IngresoMateriaScreen(),
+  ));
+}
 
 class IngresoMateriaScreen extends StatefulWidget {
   @override
@@ -7,236 +16,121 @@ class IngresoMateriaScreen extends StatefulWidget {
 }
 
 class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
+  final _materiaProvider = MateriaProvider();
   List<HorarioInput> horarios = [];
   String selectedDay = 'Lunes';
   TimeOfDay selectedStartTime = TimeOfDay.now();
   TimeOfDay selectedEndTime = TimeOfDay.now();
   bool isFirstHorario = true;
-  Color selectedColor = Colors.blue; // Color por defecto
+  Color selectedColor = Colors.blue;
+  TextEditingController nombreController = TextEditingController();
+  TextEditingController profesorController = TextEditingController();
+  TextEditingController aulaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Ingresar Materia',
-          style: TextStyle(
-            color: Color(0xFFD9CE9A), // Color del texto
-          ),
-        ),
-        iconTheme: IconThemeData(
-          color:
-              Color(0xFFD9CE9A), // Cambia el color de la flecha de retorno aquí
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Nombre de la Materia'),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Profesor'),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Aula'),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Text(
-                  'Color',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              _buildColorPicker(),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Text(
-                  'Horario',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              for (var i = 0; i < horarios.length; i++) ...[
-                _buildHorarioInput(i),
-                if (i < horarios.length - 1) Divider(),
-              ],
-              SizedBox(height: 16.0),
-              _buildAgregarHorarioButton(),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Agregar funcionalidad para guardar la materia en Firestore
-        },
-        foregroundColor: Color(0xFFD9CE9A), // Cambia el color del icono aquí
-        child: Icon(Icons.save),
-      ),
-    );
-  }
-
-  Widget _buildColorPicker() {
-    return TextButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              content: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    ColorPicker(
-                      pickerColor: selectedColor,
-                      onColorChanged: (color) {
-                        setState(() {
-                          selectedColor = color;
-                        });
-                      },
-                      colorPickerWidth: 300.0,
-                      pickerAreaHeightPercent: 0.7,
-                      enableAlpha: true,
-                      displayThumbColor: true,
-                      paletteType: PaletteType.hsv,
-                    ),
-                    SizedBox(
-                        height:
-                            16.0), // Espaciado entre el selector de color y el botón
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              10.0), // Ajusta el radio de borde
-                        ),
-                      ),
-                      child: Text(
-                        'Aceptar',
-                        style: TextStyle(
-                          color: Colors
-                              .white, // Cambia el color del texto del botón
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-      style: TextButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0), // Ajusta el radio de borde
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: selectedColor,
-              borderRadius:
-                  BorderRadius.circular(10.0), // Ajusta el radio de borde
-            ),
-          ),
-          SizedBox(width: 8.0), // Espaciado entre el icono y el texto
-          Text(
-            'Seleccionar Color',
+        appBar: AppBar(
+          title: const Text(
+            'Ingresar Materia',
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              color: Color(0xFFD9CE9A),
             ),
           ),
-        ],
-      ),
-    );
-  }
+          iconTheme: IconThemeData(
+            color: Color(0xFFD9CE9A),
+          ),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: nombreController,
+                  decoration:
+                      InputDecoration(labelText: 'Nombre de la Materia'),
+                ),
+                TextFormField(
+                  controller: profesorController,
+                  decoration: InputDecoration(labelText: 'Profesor'),
+                ),
+                TextFormField(
+                  controller: aulaController,
+                  decoration: InputDecoration(labelText: 'Aula'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    'Color',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ColorPickerWidget(
+                  selectedColor: selectedColor,
+                  onColorChanged: _onColorChanged,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    'Horario',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                for (var i = 0; i < horarios.length; i++) ...[
+                  HorarioInputWidget(
+                    selectedDay: selectedDay,
+                    selectedStartTime: selectedStartTime,
+                    selectedEndTime: selectedEndTime,
+                    isFirstHorario: isFirstHorario,
+                    onDayChanged: _onDayChanged,
+                    onStartTimeChanged: _onStartTimeChanged,
+                    onEndTimeChanged: _onEndTimeChanged,
+                    onRemoveHorario: () => _onRemoveHorario(i),
+                    horarios: [],
+                  ),
+                  if (i < horarios.length - 1) Divider(),
+                ],
+                SizedBox(height: 16.0),
+                _buildAgregarHorarioButton(),
+              ],
+            ),
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            // Crear una instancia de Materia con los datos ingresados
+            final nuevaMateria = Materia(
+              nombre: nombreController.text,
+              color: selectedColor.toString(),
+              profesor: profesorController.text,
+              aula: aulaController.text,
+              horarios: horarios
+                  .map((horario) => Horario(
+                        diaSemana: horario.selectedDay,
+                        horaInicio: horario.selectedStartTime.toString(),
+                        horaFin: horario.selectedEndTime.toString(),
+                      ))
+                  .toList(),
+            );
 
-  Widget _buildHorarioInput(int index) {
-    return Row(
-      children: [
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            value: selectedDay,
-            onChanged: (newValue) {
-              setState(() {
-                selectedDay = newValue!;
-              });
-            },
-            items: <String>[
-              'Lunes',
-              'Martes',
-              'Miércoles',
-              'Jueves',
-              'Viernes',
-              'Sábado',
-            ].map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
-        ),
-        Expanded(
-          child: TextButton(
-            onPressed: () async {
-              final selectedTime = await showTimePicker(
-                context: context,
-                initialTime: selectedStartTime,
-              );
-              if (selectedTime != null) {
-                setState(() {
-                  selectedStartTime = selectedTime;
-                });
-              }
-            },
-            child: Text(selectedStartTime.format(context)),
-          ),
-        ),
-        Expanded(
-          child: TextButton(
-            onPressed: () async {
-              final selectedTime = await showTimePicker(
-                context: context,
-                initialTime: selectedEndTime,
-              );
-              if (selectedTime != null) {
-                setState(() {
-                  selectedEndTime = selectedTime;
-                });
-              }
-            },
-            child: Text(selectedEndTime.format(context)),
-          ),
-        ),
-        if (!isFirstHorario || horarios.length > 1)
-          IconButton(
-            onPressed: () {
-              setState(() {
-                horarios.removeAt(index);
-              });
-            },
-            icon: Icon(
-              Icons.delete,
-              color: Colors.red,
-            ),
-          ),
-      ],
-    );
+            await _materiaProvider.agregarMateria(nuevaMateria);
+
+            nombreController.clear();
+            profesorController.clear();
+            aulaController.clear();
+            horarios.clear();
+          },
+          foregroundColor: Color(0xFFD9CE9A),
+          child: Icon(Icons.save),
+        ));
   }
 
   Widget _buildAgregarHorarioButton() {
@@ -247,12 +141,7 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
           shape: BoxShape.circle,
         ),
         child: IconButton(
-          onPressed: () {
-            setState(() {
-              horarios.add(HorarioInput());
-              isFirstHorario = false;
-            });
-          },
+          onPressed: _addHorario,
           icon: Icon(
             Icons.add,
             size: 32.0,
@@ -262,9 +151,49 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
       ),
     );
   }
+
+  void _onColorChanged(Color color) {
+    setState(() {
+      selectedColor = color;
+    });
+  }
+
+  void _onDayChanged(String newValue) {
+    setState(() {
+      selectedDay = newValue;
+    });
+  }
+
+  void _onStartTimeChanged(TimeOfDay newValue) {
+    setState(() {
+      selectedStartTime = newValue;
+    });
+  }
+
+  void _onEndTimeChanged(TimeOfDay newValue) {
+    setState(() {
+      selectedEndTime = newValue;
+    });
+  }
+
+  void _addHorario() {
+    setState(() {
+      horarios.add(HorarioInput());
+      isFirstHorario = false;
+    });
+  }
+
+  void _onRemoveHorario(int index) {
+    setState(() {
+      horarios.removeAt(index);
+    });
+  }
 }
 
 class HorarioInput extends StatelessWidget {
+  String selectedDay = 'Lunes'; // Puedes establecer un valor predeterminado
+  TimeOfDay selectedStartTime = TimeOfDay.now();
+  TimeOfDay selectedEndTime = TimeOfDay.now();
   @override
   Widget build(BuildContext context) {
     return SizedBox();
