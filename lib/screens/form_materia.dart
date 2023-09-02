@@ -191,11 +191,19 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
 }
 
 class HorarioInput extends StatelessWidget {
-  String selectedDay = 'Lunes'; // Puedes establecer un valor predeterminado
-  TimeOfDay selectedStartTime = TimeOfDay.now();
-  TimeOfDay selectedEndTime = TimeOfDay.now();
+  final String selectedDay;
+  final TimeOfDay? selectedStartTime;
+  final TimeOfDay? selectedEndTime;
+
+  HorarioInput({
+    this.selectedDay = 'Lunes',
+    this.selectedStartTime,
+    this.selectedEndTime,
+  });
+
   @override
   Widget build(BuildContext context) {
+    // Implementa la construcción del widget usando los valores proporcionados.
     return SizedBox();
   }
 }
