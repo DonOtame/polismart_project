@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PoliSmartScreen extends StatelessWidget {
+  const PoliSmartScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,7 +11,7 @@ class PoliSmartScreen extends StatelessWidget {
         title: const Text(
           'POLI-Smart',
           style: TextStyle(
-            color: const Color(0xFFD9CE9A), // Color del texto
+            color: Color(0xFFD9CE9A), // Color del texto
           ),
         ),
         leading: PopupMenuButton<String>(
@@ -29,8 +31,7 @@ class PoliSmartScreen extends StatelessWidget {
           },
           icon: const Icon(
             Icons.menu,
-            color:
-                const Color(0xFFD9CE9A), // Color del icono del menú emergente
+            color: Color(0xFFD9CE9A), // Color del icono del menú emergente
           ),
           color: const Color(0xFF0F2440),
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -65,7 +66,7 @@ class PoliSmartScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(
               Icons.search,
-              color: const Color(0xFFD9CE9A), // Color del icono de búsqueda
+              color: Color(0xFFD9CE9A), // Color del icono de búsqueda
             ),
             onPressed: () {
               // Agregar aquí la lógica para la búsqueda.
@@ -74,7 +75,7 @@ class PoliSmartScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(
               Icons.add,
-              color: const Color(0xFFD9CE9A), // Color del icono de agregar
+              color: Color(0xFFD9CE9A), // Color del icono de agregar
             ),
             onPressed: () {
               // Agregar aquí la lógica para navegar a otra pantalla.

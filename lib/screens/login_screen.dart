@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:polismart_project/screens/POLI-Smart_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:polismart_project/providers/auth_provider.dart';
 
@@ -26,11 +27,23 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     if (email.isNotEmpty && password.isNotEmpty) {
-      await authProvider.signInWithEmailAndPassword(email, password);
-      final authStatus = authProvider.authStatus;
-      if (authStatus == AuthStatus.Success) {
-        _showSnackBar(context, 'Inicio de sesión exitoso');
-      } else if (authStatus == AuthStatus.Error) {
+      try {
+        await authProvider.signInWithEmailAndPassword(email, password);
+        final authStatus = authProvider.authStatus;
+        if (authStatus == AuthStatus.Success) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => PoliSmartScreen(),
+            ),
+          );
+          _showSnackBar(context, 'Inicio de sesión exitoso');
+        } else if (authStatus == AuthStatus.Error) {
+          _showSnackBar(
+            context,
+            'Error al iniciar sesión. Comprueba tus credenciales.',
+          );
+        }
+      } catch (e) {
         _showSnackBar(
             context, 'Error al iniciar sesión. Comprueba tus credenciales.');
       }
