@@ -1,8 +1,4 @@
-// screens/ingreso_materia.dart
-
 import 'package:flutter/material.dart';
-import 'package:polismart_project/models/materia.dart';
-import 'package:polismart_project/services/firebase_service.dart';
 
 class IngresoMateriaScreen extends StatefulWidget {
   @override
@@ -10,145 +6,176 @@ class IngresoMateriaScreen extends StatefulWidget {
 }
 
 class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nombreController = TextEditingController();
-  final _profesorController = TextEditingController();
-  final _aulaController = TextEditingController();
-  final _horarios = <Horario>[]; // Lista de horarios
-
-  void _agregarHorario() {
-    setState(() {
-      _horarios.add(Horario(diaSemana: '', horaInicio: '', horaFin: ''));
-    });
-  }
-
-  void _eliminarHorario(int index) {
-    setState(() {
-      _horarios.removeAt(index);
-    });
-  }
-
-  void _guardarMateria() {
-    if (_formKey.currentState!.validate()) {
-      final nuevaMateria = Materia(
-        nombre: _nombreController.text,
-        color: '', // Aquí puedes establecer el color si es necesario.
-        profesor: _profesorController.text,
-        aula: _aulaController.text,
-        horarios: _horarios,
-      );
-
-      materiaProvider.agregarMateria(nuevaMateria).then((_) {
-        // Materia agregada con éxito, puedes realizar alguna acción adicional.
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Materia agregada con éxito')),
-        );
-      }).catchError((error) {
-        // Manejo de errores
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al agregar la materia: $error')),
-        );
-      });
-    }
-  }
+  List<HorarioInput> horarios = [];
+  String selectedDay = 'Lunes';
+  TimeOfDay selectedStartTime = TimeOfDay.now();
+  TimeOfDay selectedEndTime = TimeOfDay.now();
+  bool isFirstHorario = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ingresar Materia'),
+        backgroundColor: const Color(0xFF0F2440),
+        title: const Text(
+          'Ingresar Materia',
+          style: TextStyle(
+            color: Color(0xFFD9CE9A), // Color del texto
+          ),
+        ),
+        iconTheme: IconThemeData(
+          color:
+              Color(0xFFD9CE9A), // Cambia el color de la flecha de retorno aquí
+        ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
+            children: [
               TextFormField(
-                controller: _nombreController,
-                decoration: InputDecoration(labelText: 'Nombre de la materia'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Por favor, ingresa el nombre de la materia';
-                  }
-                  return null;
-                },
+                decoration: InputDecoration(labelText: 'Nombre de la Materia'),
               ),
               TextFormField(
-                controller: _profesorController,
                 decoration: InputDecoration(labelText: 'Profesor'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Por favor, ingresa el nombre del profesor';
-                  }
-                  return null;
-                },
               ),
               TextFormField(
-                controller: _aulaController,
                 decoration: InputDecoration(labelText: 'Aula'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Por favor, ingresa el nombre del aula';
-                  }
-                  return null;
-                },
               ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  'Horario',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              for (var i = 0; i < horarios.length; i++) ...[
+                _buildHorarioInput(i),
+                if (i < horarios.length - 1) Divider(),
+              ],
               SizedBox(height: 16.0),
-              Text('Horarios:'),
-              Column(
-                children: _horarios.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final horario = entry.value;
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          decoration: InputDecoration(labelText: 'Día'),
-                          onChanged: (value) {
-                            horario.diaSemana = value;
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          decoration:
-                              InputDecoration(labelText: 'Hora de inicio'),
-                          onChanged: (value) {
-                            horario.horaInicio = value;
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          decoration: InputDecoration(labelText: 'Hora de fin'),
-                          onChanged: (value) {
-                            horario.horaFin = value;
-                          },
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () => _eliminarHorario(index),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: _agregarHorario,
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _guardarMateria,
-                child: Text('Guardar Materia'),
-              ),
+              _buildAgregarHorarioButton(),
             ],
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Agregar funcionalidad para guardar la materia en Firestore
+        },
+        backgroundColor: Color(0xFF0F2440), // Cambia el color de fondo aquí
+        foregroundColor: Color(0xFFD9CE9A), // Cambia el color del icono aquí
+        child: Icon(Icons.save),
+      ),
     );
+  }
+
+  Widget _buildHorarioInput(int index) {
+    return Row(
+      children: [
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            value: selectedDay,
+            onChanged: (newValue) {
+              setState(() {
+                selectedDay = newValue!;
+              });
+            },
+            items: <String>[
+              'Lunes',
+              'Martes',
+              'Miércoles',
+              'Jueves',
+              'Viernes',
+              'Sábado',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+        ),
+        Expanded(
+          child: TextButton(
+            onPressed: () async {
+              final selectedTime = await showTimePicker(
+                context: context,
+                initialTime: selectedStartTime,
+              );
+              if (selectedTime != null) {
+                setState(() {
+                  selectedStartTime = selectedTime;
+                });
+              }
+            },
+            child: Text(selectedStartTime.format(context)),
+          ),
+        ),
+        Expanded(
+          child: TextButton(
+            onPressed: () async {
+              final selectedTime = await showTimePicker(
+                context: context,
+                initialTime: selectedEndTime,
+              );
+              if (selectedTime != null) {
+                setState(() {
+                  selectedEndTime = selectedTime;
+                });
+              }
+            },
+            child: Text(selectedEndTime.format(context)),
+          ),
+        ),
+        if (!isFirstHorario || horarios.length > 1)
+          IconButton(
+            onPressed: () {
+              setState(() {
+                horarios.removeAt(index);
+              });
+            },
+            icon: Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildAgregarHorarioButton() {
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Color(0xFF0F2440),
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          onPressed: () {
+            setState(() {
+              horarios.add(HorarioInput());
+              isFirstHorario = false;
+            });
+          },
+          icon: Icon(
+            Icons.add,
+            size: 32.0,
+            color: Color(0xFFD9CE9A),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HorarioInput extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox();
   }
 }
