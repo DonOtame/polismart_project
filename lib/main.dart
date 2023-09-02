@@ -20,6 +20,21 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  static const MaterialColor customPrimaryColor = MaterialColor(
+    0xFF0F2440, // Color personalizado
+    <int, Color>{
+      50: Color(0xFF0F2440),
+      100: Color(0xFF0F2440),
+      200: Color(0xFF0F2440),
+      300: Color(0xFF0F2440),
+      400: Color(0xFF0F2440),
+      500: Color(0xFF0F2440),
+      600: Color(0xFF0F2440),
+      700: Color(0xFF0F2440),
+      800: Color(0xFF0F2440),
+      900: Color(0xFF0F2440),
+    },
+  );
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -30,7 +45,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Polismart Project',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: customPrimaryColor,
         ),
         home: LoginScreen(),
         //home: PoliSmartScreen(),

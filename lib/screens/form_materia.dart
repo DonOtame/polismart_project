@@ -16,7 +16,6 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F2440),
         title: const Text(
           'Ingresar Materia',
           style: TextStyle(
@@ -67,7 +66,6 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
         onPressed: () {
           // Agregar funcionalidad para guardar la materia en Firestore
         },
-        backgroundColor: Color(0xFF0F2440), // Cambia el color de fondo aquí
         foregroundColor: Color(0xFFD9CE9A), // Cambia el color del icono aquí
         child: Icon(Icons.save),
       ),

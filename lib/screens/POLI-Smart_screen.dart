@@ -9,7 +9,6 @@ class PoliSmartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F2440),
         title: const Text(
           'POLI-Smart',
           style: TextStyle(
