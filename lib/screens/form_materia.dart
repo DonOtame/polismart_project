@@ -1,152 +1,152 @@
+// screens/ingreso_materia.dart
+
 import 'package:flutter/material.dart';
 import 'package:polismart_project/models/materia.dart';
-import 'package:polismart_project/services/firebase_service.dart'; // Importa el proveedor de Materia
+import 'package:polismart_project/services/firebase_service.dart';
 
-class FormIngresomateria extends StatelessWidget {
-  const FormIngresomateria({Key? key}); // Corrige el constructor
+class IngresoMateriaScreen extends StatefulWidget {
+  @override
+  _IngresoMateriaScreenState createState() => _IngresoMateriaScreenState();
+}
+
+class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _nombreController = TextEditingController();
+  final _profesorController = TextEditingController();
+  final _aulaController = TextEditingController();
+  final _horarios = <Horario>[]; // Lista de horarios
+
+  void _agregarHorario() {
+    setState(() {
+      _horarios.add(Horario(diaSemana: '', horaInicio: '', horaFin: ''));
+    });
+  }
+
+  void _eliminarHorario(int index) {
+    setState(() {
+      _horarios.removeAt(index);
+    });
+  }
+
+  void _guardarMateria() {
+    if (_formKey.currentState!.validate()) {
+      final nuevaMateria = Materia(
+        nombre: _nombreController.text,
+        color: '', // Aquí puedes establecer el color si es necesario.
+        profesor: _profesorController.text,
+        aula: _aulaController.text,
+        horarios: _horarios,
+      );
+
+      materiaProvider.agregarMateria(nuevaMateria).then((_) {
+        // Materia agregada con éxito, puedes realizar alguna acción adicional.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Materia agregada con éxito')),
+        );
+      }).catchError((error) {
+        // Manejo de errores
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al agregar la materia: $error')),
+        );
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          const IconButton(
-            onPressed: null,
-            icon: Icon(
-              Icons.search,
-              color: Colors.white,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              // Navega a la pantalla de ingreso de materia cuando se presiona el botón de agregar.
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => MateriasForm(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-          ),
-        ],
-        title: const Text('Poli-Smart'),
+        title: Text('Ingresar Materia'),
       ),
-      body: const Center(
-        child: Text('Contenido de la pantalla principal aquí'),
-      ),
-    );
-  }
-}
-
-class MateriasForm extends StatefulWidget {
-  @override
-  _MateriasFormState createState() => _MateriasFormState();
-}
-
-class _MateriasFormState extends State<MateriasForm> {
-  final _formKey = GlobalKey<FormState>();
-  String profesor = '';
-  String aula = '';
-  String materia = '';
-  String diasDeClase = '';
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextFormField(
-              decoration:
-                  const InputDecoration(labelText: 'Nombre del Profesor'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor ingresa el nombre del profesor.';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                profesor = value!;
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Aula'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor ingresa el número de aula.';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                aula = value!;
-              },
-            ),
-            TextFormField(
-              decoration:
-                  const InputDecoration(labelText: 'Nombre de la Materia'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor ingresa el nombre de la materia.';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                materia = value!;
-              },
-            ),
-            TextFormField(
-              decoration:
-                  const InputDecoration(labelText: 'Días de Clase y Horarios'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor ingresa los días de clase y horarios.';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                diasDeClase = value!;
-              },
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-
-                  // Crea un objeto Materia con los datos ingresados.
-                  final nuevaMateria = Materia(
-                    nombre: materia,
-                    color:
-                        'color_por_defecto', // Debes proporcionar un color por defecto
-                    profesor: profesor,
-                    aula: aula,
-                    horarios: [
-                      Horario(
-                        diaSemana:
-                            'Lunes', // Debes obtener los días de clase y horarios de manera adecuada
-                        horaInicio:
-                            '09:00', // Por ejemplo, desde los TextFormField
-                        horaFin: '10:30',
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                controller: _nombreController,
+                decoration: InputDecoration(labelText: 'Nombre de la materia'),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Por favor, ingresa el nombre de la materia';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _profesorController,
+                decoration: InputDecoration(labelText: 'Profesor'),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Por favor, ingresa el nombre del profesor';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _aulaController,
+                decoration: InputDecoration(labelText: 'Aula'),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Por favor, ingresa el nombre del aula';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16.0),
+              Text('Horarios:'),
+              Column(
+                children: _horarios.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final horario = entry.value;
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          decoration: InputDecoration(labelText: 'Día'),
+                          onChanged: (value) {
+                            horario.diaSemana = value;
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          decoration:
+                              InputDecoration(labelText: 'Hora de inicio'),
+                          onChanged: (value) {
+                            horario.horaInicio = value;
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          decoration: InputDecoration(labelText: 'Hora de fin'),
+                          onChanged: (value) {
+                            horario.horaFin = value;
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () => _eliminarHorario(index),
                       ),
                     ],
                   );
-
-                  // Llama a la función para agregar la materia al proveedor.
-                  await materiaProvider.agregarMateria(nuevaMateria);
-
-                  // Una vez que se guarda la materia, puedes navegar de regreso a la pantalla principal.
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('Guardar'),
-            ),
-          ],
+                }).toList(),
+              ),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: _agregarHorario,
+              ),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: _guardarMateria,
+                child: Text('Guardar Materia'),
+              ),
+            ],
+          ),
         ),
       ),
     );

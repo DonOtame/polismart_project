@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:polismart_project/screens/form_materia.dart';
 import 'package:polismart_project/widgets/materia_card.dart';
 
 class PoliSmartScreen extends StatelessWidget {
@@ -79,7 +80,11 @@ class PoliSmartScreen extends StatelessWidget {
               color: Color(0xFFD9CE9A), // Color del icono de agregar
             ),
             onPressed: () {
-              // Agregar aquí la lógica para navegar a otra pantalla.
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => IngresoMateriaScreen(),
+                ),
+              );
             },
           ),
         ],

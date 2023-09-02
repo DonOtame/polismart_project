@@ -15,9 +15,9 @@ class Materia {
 }
 
 class Horario {
-  final String diaSemana;
-  final String horaInicio;
-  final String horaFin;
+  late final String diaSemana;
+  late final String horaInicio;
+  late final String horaFin;
 
   Horario({
     required this.diaSemana,
