@@ -3,14 +3,14 @@ class Materia {
   final String color;
   final String profesor;
   final String aula;
-  final List<Horario> horarios;
+  final Horario horario;
 
   Materia({
     required this.nombre,
     required this.color,
     required this.profesor,
     required this.aula,
-    required this.horarios,
+    required this.horario,
   });
 }
 

@@ -1,47 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:polismart_project/screens/form_materia.dart';
 
-class HorarioInputWidget extends StatelessWidget {
-  final String selectedDay;
-  final TimeOfDay selectedStartTime;
-  final TimeOfDay selectedEndTime;
-  final bool isFirstHorario;
-  final Function(String) onDayChanged;
-  final Function(TimeOfDay) onStartTimeChanged;
-  final Function(TimeOfDay) onEndTimeChanged;
-  final Function() onRemoveHorario;
-  final List<HorarioInput> horarios;
+class HorarioInputWidget extends StatefulWidget {
+  final Function(String?, TimeOfDay?, TimeOfDay?) onHorarioChanged;
 
-  HorarioInputWidget({
-    required this.selectedDay,
-    required this.selectedStartTime,
-    required this.selectedEndTime,
-    required this.isFirstHorario,
-    required this.onDayChanged,
-    required this.onStartTimeChanged,
-    required this.onEndTimeChanged,
-    required this.onRemoveHorario,
-    required this.horarios,
-  });
+  HorarioInputWidget({required this.onHorarioChanged});
+
+  @override
+  _HorarioInputWidgetState createState() => _HorarioInputWidgetState();
+}
+
+class _HorarioInputWidgetState extends State<HorarioInputWidget> {
+  String? selectedDay;
+  TimeOfDay? selectedStartTime;
+  TimeOfDay? selectedEndTime;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
-          child: DropdownButtonFormField<String>(
+          child: DropdownButton<String>(
+            hint: Text("Día"),
             value: selectedDay,
             onChanged: (newValue) {
-              onDayChanged(
-                  newValue!); // Llama a la función proporcionada cuando cambia el día.
+              setState(() {
+                selectedDay = newValue;
+              });
+              widget.onHorarioChanged(
+                  selectedDay, selectedStartTime, selectedEndTime);
             },
-            items: <String>[
-              'Lunes',
-              'Martes',
-              'Miércoles',
-              'Jueves',
-              'Viernes',
-              'Sábado',
+            items: [
+              "Lunes",
+              "Martes",
+              "Miércoles",
+              "Jueves",
+              "Viernes",
+              "Sábado"
             ].map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
@@ -55,14 +49,19 @@ class HorarioInputWidget extends StatelessWidget {
             onPressed: () async {
               final selectedTime = await showTimePicker(
                 context: context,
-                initialTime: selectedStartTime,
+                initialTime: selectedStartTime ?? TimeOfDay.now(),
               );
               if (selectedTime != null) {
-                onStartTimeChanged(
-                    selectedTime); // Llama a la función proporcionada cuando cambia la hora de inicio.
+                setState(() {
+                  selectedStartTime = selectedTime;
+                });
+                widget.onHorarioChanged(
+                    selectedDay, selectedStartTime, selectedEndTime);
               }
             },
-            child: Text(selectedStartTime.format(context)),
+            child: Text(
+              selectedStartTime?.format(context) ?? "Inicio",
+            ),
           ),
         ),
         Expanded(
@@ -70,25 +69,21 @@ class HorarioInputWidget extends StatelessWidget {
             onPressed: () async {
               final selectedTime = await showTimePicker(
                 context: context,
-                initialTime: selectedEndTime,
+                initialTime: selectedEndTime ?? TimeOfDay.now(),
               );
               if (selectedTime != null) {
-                onEndTimeChanged(
-                    selectedTime); // Llama a la función proporcionada cuando cambia la hora de finalización.
+                setState(() {
+                  selectedEndTime = selectedTime;
+                });
+                widget.onHorarioChanged(
+                    selectedDay, selectedStartTime, selectedEndTime);
               }
             },
-            child: Text(selectedEndTime.format(context)),
-          ),
-        ),
-        if (!isFirstHorario || horarios.length > 1)
-          IconButton(
-            onPressed:
-                onRemoveHorario, // Llama a la función proporcionada al eliminar el horario.
-            icon: Icon(
-              Icons.delete,
-              color: Colors.red,
+            child: Text(
+              selectedEndTime?.format(context) ?? "Fin",
             ),
           ),
+        ),
       ],
     );
   }

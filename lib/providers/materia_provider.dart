@@ -11,13 +11,11 @@ class MateriaProvider {
       'color': materia.color,
       'profesor': materia.profesor,
       'aula': materia.aula,
-      'horarios': materia.horarios.map((horario) {
-        return {
-          'diaSemana': horario.diaSemana,
-          'horaInicio': horario.horaInicio,
-          'horaFin': horario.horaFin,
-        };
-      }).toList(),
+      'horario': {
+        'diaSemana': materia.horario.diaSemana,
+        'horaInicio': materia.horario.horaInicio,
+        'horaFin': materia.horario.horaFin,
+      },
     });
   }
 }
