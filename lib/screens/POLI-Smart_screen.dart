@@ -83,12 +83,7 @@ class PoliSmartScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text(
-          'Contenido de la pantalla POLI-Smart',
-          style: TextStyle(fontSize: 24, color: Colors.black),
-        ),
-      ),
+      body: MateriasList(),
       extendBodyBehindAppBar: true, // Extiende el contenido detrás del AppBar.
       extendBody: true, // Extiende el contenido detrás del AppBar.
       bottomNavigationBar: BottomNavigationBar(
@@ -122,6 +117,86 @@ class PoliSmartScreen extends StatelessWidget {
             false, // Oculta las etiquetas de los íconos seleccionados.
         showUnselectedLabels:
             false, // Oculta las etiquetas de los íconos no seleccionados.
+      ),
+    );
+  }
+}
+
+class MateriasList extends StatelessWidget {
+  final List<Map<String, dynamic>> materias = [
+    {'nombre': 'Matemáticas', 'color': Colors.blue},
+    {'nombre': 'Ciencias', 'color': Colors.red},
+    {'nombre': 'Historia', 'color': Colors.green},
+    {'nombre': 'Geografía', 'color': Colors.orange},
+    {'nombre': 'Arte', 'color': Colors.purple},
+    {'nombre': 'Educación Física', 'color': Colors.teal},
+    // Agrega más materias con colores aquí
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: (materias.length / 2).ceil(),
+      itemBuilder: (context, index) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            MateriaCard(
+              nombre: materias[index * 2]['nombre'],
+              iconColor: materias[index * 2]['color'],
+            ),
+            if ((index * 2 + 1) < materias.length)
+              MateriaCard(
+                nombre: materias[index * 2 + 1]['nombre'],
+                iconColor: materias[index * 2 + 1]['color'],
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class MateriaCard extends StatelessWidget {
+  final String nombre;
+  final Color iconColor;
+
+  MateriaCard({required this.nombre, required this.iconColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        // Agrega aquí la lógica que deseas ejecutar al tocar la tarjeta.
+      },
+      child: SizedBox(
+        height: 200,
+        width: 190,
+        child: Card(
+          elevation: 3,
+          margin: const EdgeInsets.all(10),
+          child: Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.book,
+                  size: 125.00,
+                  color: iconColor, // Color del icono de la materia
+                ),
+                const SizedBox(height: 15), // Reduce el espacio inferior aquí
+                Text(
+                  nombre,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black, // Color del nombre de la materia
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
