@@ -3,15 +3,32 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/screens/materia_info.dart';
 import 'package:polismart_project/screens/form_materia.dart';
 import 'package:polismart_project/services/color_util.dart';
+import 'package:polismart_project/widgets/materia_content.dart';
 
-class PoliSmartScreen extends StatelessWidget {
+class PoliSmartScreen extends StatefulWidget {
   const PoliSmartScreen({Key? key});
 
-  // Función para obtener la lista de materias desde Firestore
-  Future<List<QueryDocumentSnapshot>> fetchMateriasFromFirestore() async {
+  @override
+  _PoliSmartScreenState createState() => _PoliSmartScreenState();
+}
+
+class _PoliSmartScreenState extends State<PoliSmartScreen> {
+  int _currentIndex = 0;
+
+  // Función para cambiar la página actual
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  Future<void> fetchDataFromFirestore() async {
     final QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('materias').get();
-    return querySnapshot.docs;
+
+    querySnapshot.docs.forEach((document) {
+      print(document.data());
+    });
   }
 
   @override
@@ -40,83 +57,42 @@ class PoliSmartScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: FutureBuilder<List<QueryDocumentSnapshot>>(
-        future: fetchMateriasFromFirestore(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          }
-
-          final List<QueryDocumentSnapshot> documents = snapshot.data!;
-
-          return GridView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-            ),
-            itemCount: documents.length,
-            itemBuilder: (context, index) {
-              final data = documents[index].data() as Map<String, dynamic>;
-              final nombre = data['nombre'];
-              final colorString = data['color'];
-              final color = getColorFromFirebaseString(colorString);
-
-              return InkWell(
-                onTap: () {
-                  print('Tocaste la tarjeta $nombre');
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          DetalleMateriaScreen(nombreMateria: nombre),
-                    ),
-                  );
-                },
-                child: Card(
-                  elevation: 3,
-                  margin: const EdgeInsets.all(10),
-                  child: AspectRatio(
-                    aspectRatio: 3.0 / 4.0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.book,
-                            size: 64.0,
-                            color: color,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            nombre,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
+      body:
+          _currentIndex == 0 // Mostrar el contenido en la página de "Materias"
+              ? buildMateriasContent()
+              : _buildEmptyPage(), // Otras páginas (por ahora vacías)
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: const Color(0xFFD9CE9A),
+        unselectedItemColor: const Color(0xFFD9CE9A),
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book), // Icono para Materias
+            label: 'Materias',
+            backgroundColor: Color(0xFF0F2440),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.schedule), // Icono para Horarios
+            label: 'Horarios',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment), // Icono para Tareas
+            label: 'Tareas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attachment), // Icono para Material
+            label: 'Material',
+          ),
+        ],
       ),
+    );
+  }
+
+  // Función para mostrar páginas vacías (para Horarios, Tareas y Material)
+  Widget _buildEmptyPage() {
+    return Center(
+      child: Text('Esta página está vacía.'),
     );
   }
 }
