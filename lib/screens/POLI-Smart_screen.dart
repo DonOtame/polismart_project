@@ -92,15 +92,6 @@ class PoliSmartScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(
-              Icons.search,
-              color: Color(0xFFD9CE9A), // Color del icono de búsqueda
-            ),
-            onPressed: () {
-              // Agregar aquí la lógica para la búsqueda.
-            },
-          ),
-          IconButton(
-            icon: const Icon(
               Icons.add,
               color: Color(0xFFD9CE9A), // Color del icono de agregar
             ),
