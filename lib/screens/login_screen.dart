@@ -19,73 +19,86 @@ class _LoginScreenState extends State<LoginScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
-      key: _scaffoldKey, // Clave para el ScaffoldMessenger
+      key: _scaffoldKey,
       body: ListView(
-        // Cambiamos SingleChildScrollView por ListView
         children: [
-          const SizedBox(height: 20.0), // Espacio arriba de la imagen
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Image.network(
-              'https://firebasestorage.googleapis.com/v0/b/polismart-6f6ee.appspot.com/o/logo.png?alt=media&token=10ca46a6-b6f8-4046-b8c0-457c1ee70bb6',
-              width: 200.0, // Ajusta el ancho según tus necesidades
-              height: 200.0, // Ajusta la altura según tus necesidades
-            ),
+          SizedBox(height: 20.0),
+          buildLogo(),
+          SizedBox(height: 20.0),
+          buildTextField(
+            controller: emailController,
+            labelText: 'Correo electrónico',
+            prefixIcon: Icons.email,
           ),
-          const SizedBox(height: 20.0), // Espacio debajo de la imagen
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Correo electrónico',
-                prefixIcon: Icon(Icons.email),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                ),
-              ),
-            ),
+          buildTextField(
+            controller: passwordController,
+            labelText: 'Contraseña',
+            prefixIcon: Icons.lock,
+            obscureText: true,
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Contraseña',
-                prefixIcon: Icon(Icons.lock),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                ),
-              ),
-              obscureText: true,
-            ),
-          ),
-          const SizedBox(height: 32.0),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () => _signIn(context, authProvider),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0F2440), // Color del botón
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-              child: Container(
-                width: double.infinity,
-                alignment: Alignment.center,
-                child: const Text(
-                  'Iniciar sesión',
-                  style: TextStyle(
-                    color: Colors.white, // Color del texto del botón
-                    fontSize: 16.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          SizedBox(height: 32.0),
+          buildSignInButton(context, authProvider),
         ],
+      ),
+    );
+  }
+
+  Widget buildLogo() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Image.network(
+        'https://firebasestorage.googleapis.com/v0/b/polismart-6f6ee.appspot.com/o/logo.png?alt=media&token=10ca46a6-b6f8-4046-b8c0-457c1ee70bb6',
+        width: 200.0,
+        height: 200.0,
+      ),
+    );
+  }
+
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData prefixIcon,
+    bool obscureText = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: labelText,
+          prefixIcon: Icon(prefixIcon),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          ),
+        ),
+        obscureText: obscureText,
+      ),
+    );
+  }
+
+  Widget buildSignInButton(BuildContext context, AuthProvider authProvider) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ElevatedButton(
+        onPressed: () => _signIn(context, authProvider),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF0F2440),
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        child: Container(
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: const Text(
+            'Iniciar sesión',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16.0,
+            ),
+          ),
+        ),
       ),
     );
   }
