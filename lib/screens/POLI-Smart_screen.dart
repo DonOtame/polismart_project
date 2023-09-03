@@ -7,13 +7,11 @@ import 'package:polismart_project/services/color_util.dart';
 class PoliSmartScreen extends StatelessWidget {
   const PoliSmartScreen({Key? key});
 
-  Future<void> fetchDataFromFirestore() async {
+  // Función para obtener la lista de materias desde Firestore
+  Future<List<QueryDocumentSnapshot>> fetchMateriasFromFirestore() async {
     final QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('materias').get();
-
-    querySnapshot.docs.forEach((document) {
-      print(document.data());
-    });
+    return querySnapshot.docs;
   }
 
   @override
@@ -42,22 +40,22 @@ class PoliSmartScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('materias').snapshots(),
+      body: FutureBuilder<List<QueryDocumentSnapshot>>(
+        future: fetchMateriasFromFirestore(),
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          }
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+
+          final List<QueryDocumentSnapshot> documents = snapshot.data!;
 
           return GridView.builder(
             shrinkWrap: true,
