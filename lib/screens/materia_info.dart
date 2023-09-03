@@ -4,6 +4,7 @@ import 'package:polismart_project/models/materia.dart';
 import 'package:polismart_project/screens/form_materialclase.dart';
 import 'package:polismart_project/screens/form_tarea.dart';
 import 'package:polismart_project/services/firebase_tareas.dart';
+import 'package:polismart_project/services/firebase_deleteMateria.dart';
 import 'package:polismart_project/widgets/material_clase_list.dart';
 
 class DetalleMateriaScreen extends StatefulWidget {
@@ -34,8 +35,12 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.delete),
-            onPressed: () {
-              _confirmDeleteMateria(context);
+            onPressed: () async {
+              final confirmacionEliminacion =
+                  await confirmDeleteMateria(context, widget.nombreMateria);
+              if (confirmacionEliminacion) {
+                Navigator.of(context).pop();
+              }
             },
           ),
         ],
@@ -251,80 +256,6 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
     );
   }
 
-// Función para cambiar el estado de una tarea
-  void _actualizarEstadoTarea(DocumentSnapshot tarea, bool estado) {
-    tarea.reference.update({'estado': estado});
-  }
-
-// Función para eliminar una tarea
-  void _eliminarTarea(DocumentSnapshot tarea) {
-    tarea.reference.delete();
-  }
-
-  void _abrirFormTarea(BuildContext context) {
-    // Navegar a la pantalla de formulario de tareas y pasar el nombre de la materia
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => FormTarea(nombreMateria: widget.nombreMateria),
-      ),
-    );
-  }
-
-  Future<void> _confirmDeleteMateria(BuildContext context) async {
-    final confirmDelete = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirmar eliminación'),
-          content: Text('¿Estás seguro de que deseas eliminar esta materia?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancelar'),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            ),
-            TextButton(
-              child: Text('Eliminar'),
-              onPressed: () async {
-                // Eliminar la materia de Firebase
-                try {
-                  await FirebaseFirestore.instance
-                      .collection('materias')
-                      .where('nombre', isEqualTo: widget.nombreMateria)
-                      .get()
-                      .then((querySnapshot) {
-                    querySnapshot.docs.forEach((doc) {
-                      doc.reference.delete();
-                    });
-                  });
-
-                  // Mostrar un SnackBar para confirmar la eliminación exitosa
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('La materia se ha eliminado con éxito'),
-                    ),
-                  );
-
-                  // Regresar a la pantalla anterior
-                  Navigator.of(context).pop(true);
-                } catch (e) {
-                  print('Error al eliminar la materia: $e');
-                  Navigator.of(context).pop(false);
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmDelete == true) {
-      // Regresar a la pantalla anterior si se confirmó la eliminación
-      Navigator.of(context).pop();
-    }
-  }
-
 // Implementa el contenido de la pestaña Material de Clase
   Widget _buildMaterialClase(BuildContext context) {
     return SingleChildScrollView(
@@ -353,6 +284,25 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
       MaterialPageRoute(
         builder: (context) =>
             FormMaterialClase(nombreMateria: widget.nombreMateria),
+      ),
+    );
+  }
+
+  // Función para cambiar el estado de una tarea
+  void _actualizarEstadoTarea(DocumentSnapshot tarea, bool estado) {
+    tarea.reference.update({'estado': estado});
+  }
+
+// Función para eliminar una tarea
+  void _eliminarTarea(DocumentSnapshot tarea) {
+    tarea.reference.delete();
+  }
+
+  void _abrirFormTarea(BuildContext context) {
+    // Navegar a la pantalla de formulario de tareas y pasar el nombre de la materia
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FormTarea(nombreMateria: widget.nombreMateria),
       ),
     );
   }
