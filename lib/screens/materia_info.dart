@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importa Cloud Firestore
 import 'package:polismart_project/models/materia.dart';
 
 class DetalleMateriaScreen extends StatelessWidget {
@@ -41,21 +42,41 @@ class DetalleMateriaScreen extends StatelessWidget {
     );
   }
 
-  // Función para obtener los detalles de la materia desde Firebase o cualquier otra fuente.
+  // Función para obtener los detalles de la materia desde Firebase.
   Future<Materia> obtenerDetallesDeFirebase(String nombreMateria) async {
-    // Aquí puedes implementar la lógica para buscar los detalles de la materia en Firebase
-    // u otra fuente de datos basándote en el nombreMateria.
-    // Devuelve una instancia de Materia con los detalles correspondientes.
-    return Materia(
-      nombre: nombreMateria,
-      color: 'Color de ejemplo',
-      profesor: 'Profesor de ejemplo',
-      aula: 'Aula de ejemplo',
-      horario: Horario(
-        diaSemana: 'Día de ejemplo',
-        horaInicio: 'Hora de inicio de ejemplo',
-        horaFin: 'Hora de fin de ejemplo',
-      ),
-    );
+    try {
+      final QuerySnapshot materias = await FirebaseFirestore.instance
+          .collection('materias')
+          .where('nombre', isEqualTo: nombreMateria)
+          .get();
+
+      if (materias.docs.isNotEmpty) {
+        final data = materias.docs.first.data() as Map<String, dynamic>;
+        final String color = data['color'];
+        final String profesor = data['profesor'];
+        final String aula = data['aula'];
+        final Map<String, dynamic> horarioData = data['horario'];
+
+        final Horario horario = Horario(
+          diaSemana: horarioData['diaSemana'],
+          horaInicio: horarioData['horaInicio'],
+          horaFin: horarioData['horaFin'],
+        );
+
+        return Materia(
+          nombre: nombreMateria,
+          color: color,
+          profesor: profesor,
+          aula: aula,
+          horario: horario,
+        );
+      } else {
+        throw Exception('La materia no fue encontrada');
+      }
+    } catch (e) {
+      // Manejo de errores, puedes personalizarlo según tus necesidades
+      print('Error al obtener detalles de la materia: $e');
+      throw e;
+    }
   }
 }
