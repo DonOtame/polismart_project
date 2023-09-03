@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Importa Cloud Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/models/materia.dart';
 
 class DetalleMateriaScreen extends StatefulWidget {
@@ -12,7 +12,8 @@ class DetalleMateriaScreen extends StatefulWidget {
 }
 
 class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
-  int _selectedIndex = 0; // Índice de la pestaña seleccionada
+  int _selectedIndex = 0;
+  bool _isDeleting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -21,50 +22,69 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         title: Text(
           widget.nombreMateria,
           style: TextStyle(
-            color: Color(0xFFD9CE9A),
+            color: const Color(0xFFD9CE9A),
           ),
         ),
         iconTheme: const IconThemeData(
-          color: Color(0xFFD9CE9A),
+          color: const Color(0xFFD9CE9A),
         ),
       ),
-      body: _selectedIndex == 0
-          ? _buildDetalles() // Contenido de la pestaña Detalles
-          : _selectedIndex == 1
-              ? _buildTareas() // Contenido de la pestaña Tareas
-              : _buildMaterialClase(), // Contenido de la pestaña Material de Clase
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF0F2440),
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.details),
-            label: 'Detalles',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Tareas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.class_),
-            label: 'Material de Clase',
-          ),
-        ],
-        selectedItemColor: const Color(0xFFD9CE9A),
-        unselectedItemColor: const Color(0xFFD9CE9A),
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
+      body: _buildBody(),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+      floatingActionButton: _isDeleting
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                _confirmDeleteMateria(context);
+              },
+              child: Icon(Icons.delete),
+            ),
     );
   }
 
-  // Función para cambiar de pestaña al tocar un ítem en el BottomNavigationBar
+  Widget _buildBody() {
+    switch (_selectedIndex) {
+      case 0:
+        return _buildDetalles();
+      case 1:
+        return _buildTareas();
+      case 2:
+        return _buildMaterialClase();
+      default:
+        return Container(); // Puedes personalizar el caso por defecto
+    }
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      backgroundColor: const Color(0xFF0F2440),
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.details),
+          label: 'Detalles',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.assignment),
+          label: 'Tareas',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.class_),
+          label: 'Material de Clase',
+        ),
+      ],
+      selectedItemColor: const Color(0xFFD9CE9A),
+      unselectedItemColor: const Color(0xFFD9CE9A),
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+    );
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  // Implementa el contenido de la pestaña Detalles
   Widget _buildDetalles() {
     return FutureBuilder<Materia>(
       future: obtenerDetallesDeFirebase(widget.nombreMateria),
@@ -166,25 +186,71 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         throw Exception('La materia no fue encontrada');
       }
     } catch (e) {
-      // Manejo de errores, puedes personalizarlo según tus necesidades
       print('Error al obtener detalles de la materia: $e');
       throw e;
     }
   }
 
-  // Implementa el contenido de la pestaña Tareas
   Widget _buildTareas() {
-    // Contenido de la pestaña Tareas (puedes personalizarlo)
     return Center(
       child: Text('Contenido de la pestaña Tareas'),
     );
   }
 
-  // Implementa el contenido de la pestaña Material de Clase
   Widget _buildMaterialClase() {
-    // Contenido de la pestaña Material de Clase (puedes personalizarlo)
     return Center(
       child: Text('Contenido de la pestaña Material de Clase'),
     );
+  }
+
+  Future<void> _confirmDeleteMateria(BuildContext context) async {
+    final confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmar eliminación'),
+          content: Text('¿Estás seguro de que deseas eliminar esta materia?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: Text('Eliminar'),
+              onPressed: () async {
+                try {
+                  await FirebaseFirestore.instance
+                      .collection('materias')
+                      .where('nombre', isEqualTo: widget.nombreMateria)
+                      .get()
+                      .then((querySnapshot) {
+                    querySnapshot.docs.forEach((doc) {
+                      doc.reference.delete();
+                    });
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('La materia se ha eliminado con éxito'),
+                    ),
+                  );
+
+                  Navigator.of(context).pop(true);
+                } catch (e) {
+                  print('Error al eliminar la materia: $e');
+                  Navigator.of(context).pop(false);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      Navigator.of(context).pop();
+    }
   }
 }
