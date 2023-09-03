@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/models/materia.dart';
 import 'package:polismart_project/screens/form_materialclase.dart';
 import 'package:polismart_project/screens/form_tarea.dart';
+import 'package:polismart_project/widgets/material_clase_list.dart';
 
 class DetalleMateriaScreen extends StatefulWidget {
   final String nombreMateria;
@@ -305,34 +306,6 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
     );
   }
 
-// Implementa el contenido de la pestaña Material de Clase
-  Widget _buildMaterialClase(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Contenido de la pestaña Material de Clase'),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              _abrirFormMaterial(context);
-            },
-            child: Text('Agregar Material'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _abrirFormMaterial(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) =>
-            FormMaterialClase(nombreMateria: widget.nombreMateria),
-      ),
-    );
-  }
-
   Future<void> _confirmDeleteMateria(BuildContext context) async {
     final confirmDelete = await showDialog<bool>(
       context: context,
@@ -386,5 +359,37 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
       // Regresar a la pantalla anterior si se confirmó la eliminación
       Navigator.of(context).pop();
     }
+  }
+
+// Implementa el contenido de la pestaña Material de Clase
+  Widget _buildMaterialClase(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          MaterialClaseList(
+            nombreMateria: widget.nombreMateria,
+          ),
+          SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ElevatedButton(
+              onPressed: () {
+                _abrirFormMaterial(context);
+              },
+              child: Text('Agregar Material'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _abrirFormMaterial(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+            FormMaterialClase(nombreMateria: widget.nombreMateria),
+      ),
+    );
   }
 }
