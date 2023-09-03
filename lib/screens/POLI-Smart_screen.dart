@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:polismart_project/screens/materia_info.dart';
 import 'package:polismart_project/screens/form_materia.dart';
-import 'package:polismart_project/services/color_util.dart';
 import 'package:polismart_project/widgets/materia_content.dart';
 
 class PoliSmartScreen extends StatefulWidget {
