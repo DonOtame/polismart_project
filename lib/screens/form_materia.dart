@@ -46,14 +46,35 @@ class _IngresoMateriaScreenState extends State<IngresoMateriaScreen> {
                 controller: nombreController,
                 decoration:
                     const InputDecoration(labelText: 'Nombre de la Materia'),
+                onChanged: (text) {
+                  // Convierte automáticamente el texto a mayúsculas
+                  nombreController.text = text.toUpperCase();
+                  nombreController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: nombreController.text.length),
+                  );
+                },
               ),
               TextFormField(
                 controller: profesorController,
                 decoration: const InputDecoration(labelText: 'Profesor'),
+                onChanged: (text) {
+                  // Convierte automáticamente el texto a mayúsculas
+                  profesorController.text = text.toUpperCase();
+                  profesorController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: profesorController.text.length),
+                  );
+                },
               ),
               TextFormField(
                 controller: aulaController,
                 decoration: const InputDecoration(labelText: 'Aula'),
+                onChanged: (text) {
+                  // Convierte automáticamente el texto a mayúsculas
+                  aulaController.text = text.toUpperCase();
+                  aulaController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: aulaController.text.length),
+                  );
+                },
               ),
               const Padding(
                 padding: EdgeInsets.only(top: 16.0),

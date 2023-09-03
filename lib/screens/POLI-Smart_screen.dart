@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:polismart_project/screens/form_materia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:polismart_project/screens/materia_info.dart';
 
 class PoliSmartScreen extends StatelessWidget {
   const PoliSmartScreen({Key? key});
@@ -147,8 +148,15 @@ class PoliSmartScreen extends StatelessWidget {
 
                 return InkWell(
                   onTap: () {
-                    // Definir la acción que deseas realizar al tocar una tarjeta
+                    // Realiza la acción que desees al tocar la tarjeta
                     print('Tocaste la tarjeta $nombre');
+                    // Puedes abrir la pantalla de detalles aquí si lo deseas
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            DetalleMateriaScreen(nombreMateria: nombre),
+                      ),
+                    );
                   },
                   child: Card(
                     elevation: 3,
