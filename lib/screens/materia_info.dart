@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/models/materia.dart';
+import 'package:polismart_project/screens/form_tarea.dart';
 
 class DetalleMateriaScreen extends StatefulWidget {
   final String nombreMateria;
@@ -32,7 +33,7 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
       body: _selectedIndex == 0
           ? _buildDetalles() // Contenido de la pestaña Detalles
           : _selectedIndex == 1
-              ? _buildTareas() // Contenido de la pestaña Tareas
+              ? _buildTareas(context) // Contenido de la pestaña Tareas
               : _buildMaterialClase(), // Contenido de la pestaña Material de Clase
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color(0xFF0F2440),
@@ -181,11 +182,31 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
     }
   }
 
-  // Implementa el contenido de la pestaña Tareas
-  Widget _buildTareas() {
-    // Contenido de la pestaña Tareas (puedes personalizarlo)
+// Implementa el contenido de la pestaña Tareas
+  Widget _buildTareas(BuildContext context) {
     return Center(
-      child: Text('Contenido de la pestaña Tareas'),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Contenido de la pestaña Tareas'),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              _abrirFormTarea(context);
+            },
+            child: Text('Agregar Tarea'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _abrirFormTarea(BuildContext context) {
+    // Navegar a la pantalla de formulario de tareas y pasar el nombre de la materia
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FormTarea(nombreMateria: widget.nombreMateria),
+      ),
     );
   }
 

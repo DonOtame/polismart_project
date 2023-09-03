@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Para formatear la fecha
 import 'package:polismart_project/models/tarea.dart';
 
 class FormTarea extends StatefulWidget {
@@ -14,10 +15,8 @@ class FormTarea extends StatefulWidget {
 class _FormTareaState extends State<FormTarea> {
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _descripcionController = TextEditingController();
-  final TextEditingController _fechaCreacionController =
-      TextEditingController();
-  final TextEditingController _fechaFinController = TextEditingController();
-  final bool _estado = true; // El estado se configura como true por defecto
+  DateTime _fechaFin = DateTime.now(); // Fecha de Finalización seleccionada
+  final bool _estado = false; // El estado se configura como true por defecto
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +36,28 @@ class _FormTareaState extends State<FormTarea> {
               controller: _descripcionController,
               decoration: InputDecoration(labelText: 'Descripción de la Tarea'),
             ),
-            TextField(
-              controller: _fechaCreacionController,
-              decoration: InputDecoration(labelText: 'Fecha de Creación'),
-            ),
-            TextField(
-              controller: _fechaFinController,
-              decoration: InputDecoration(labelText: 'Fecha de Finalización'),
+            // Campo de fecha de finalización con botón para abrir el selector
+            Row(
+              children: [
+                Icon(Icons.calendar_today),
+                SizedBox(width: 10), // Espacio entre el icono y el texto
+                Text(
+                  'Fecha de Finalización:',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(width: 10), // Espacio entre el texto y la fecha
+                Text(
+                  '${DateFormat('dd/MM/yyyy').format(_fechaFin)}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                Spacer(), // Espacio entre la fecha y el borde derecho
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    _seleccionarFecha(context);
+                  },
+                ),
+              ],
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -58,17 +72,30 @@ class _FormTareaState extends State<FormTarea> {
     );
   }
 
+  // Función para abrir el selector de fecha
+  Future<void> _seleccionarFecha(BuildContext context) async {
+    final DateTime? fechaSeleccionada = await showDatePicker(
+      context: context,
+      initialDate: _fechaFin,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+
+    if (fechaSeleccionada != null && fechaSeleccionada != _fechaFin) {
+      setState(() {
+        _fechaFin = fechaSeleccionada;
+      });
+    }
+  }
+
   void _guardarTarea() {
     final titulo = _tituloController.text;
     final descripcion = _descripcionController.text;
-    final fechaCreacion = _fechaCreacionController.text;
-    final fechaFin = _fechaFinController.text;
+    final fechaCreacion = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    final fechaFin = DateFormat('dd/MM/yyyy').format(_fechaFin);
 
     // Validar que los campos no estén vacíos
-    if (titulo.isEmpty ||
-        descripcion.isEmpty ||
-        fechaCreacion.isEmpty ||
-        fechaFin.isEmpty) {
+    if (titulo.isEmpty || descripcion.isEmpty || fechaFin.isEmpty) {
       showDialog(
         context: context,
         builder: (context) {
@@ -103,7 +130,8 @@ class _FormTareaState extends State<FormTarea> {
         .collection('materias')
         .doc(widget.nombreMateria)
         .collection('tareas')
-        .doc();
+        .doc(tarea
+            .titulo); // El título de la tarea se utiliza como identificador
 
     tareaRef.set({
       'titulo': tarea.titulo,
@@ -123,8 +151,6 @@ class _FormTareaState extends State<FormTarea> {
   void dispose() {
     _tituloController.dispose();
     _descripcionController.dispose();
-    _fechaCreacionController.dispose();
-    _fechaFinController.dispose();
     super.dispose();
   }
 }
