@@ -17,17 +17,20 @@ class MaterialClaseList extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Text('No hay materiales de clase disponibles.');
+          return Center(
+            child: Text('No hay materiales de clase disponibles.'),
+          );
         }
 
         final materials = snapshot.data!.docs;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Materiales de Clase:'),
             ListView.builder(
               shrinkWrap: true,
               itemCount: materials.length,
@@ -38,35 +41,65 @@ class MaterialClaseList extends StatelessWidget {
                 final titulo = material['titulo'];
                 final url = material['url'];
 
-                return ListTile(
-                  title: Text('Tipo: $tipo'),
-                  subtitle: Text('Título: $titulo'),
-                  onTap: () async {
-                    final urlToLaunch = Uri.tryParse(url);
-                    if (urlToLaunch != null && urlToLaunch.isAbsolute) {
-                      if (await canLaunchUrl(urlToLaunch)) {
-                        await launchUrl(urlToLaunch);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('No se puede abrir el enlace: $url'),
-                          ),
-                        );
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('El URL no es válido: $url'),
-                        ),
-                      );
-                    }
-                  },
+                return MaterialClaseCard(
+                  tipo: tipo,
+                  titulo: titulo,
+                  url: url,
                 );
               },
             ),
           ],
         );
       },
+    );
+  }
+}
+
+class MaterialClaseCard extends StatelessWidget {
+  final String tipo;
+  final String titulo;
+  final String url;
+
+  MaterialClaseCard({
+    required this.tipo,
+    required this.titulo,
+    required this.url,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3,
+      margin: EdgeInsets.all(8),
+      child: InkWell(
+        onTap: () async {
+          final urlToLaunch = Uri.tryParse(url);
+          if (urlToLaunch != null && urlToLaunch.isAbsolute) {
+            if (await canLaunch(urlToLaunch.toString())) {
+              await launch(urlToLaunch.toString());
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('No se puede abrir el enlace: $url'),
+                ),
+              );
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('El URL no es válido: $url'),
+              ),
+            );
+          }
+        },
+        child: ListTile(
+          title: Text(
+            'Tipo: $tipo',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text('Título: $titulo'),
+        ),
+      ),
     );
   }
 }
