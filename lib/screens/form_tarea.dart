@@ -32,9 +32,11 @@ class _FormTareaState extends State<FormTarea> {
               controller: _tituloController,
               decoration: InputDecoration(labelText: 'Título de la Tarea'),
             ),
-            TextField(
+            // Reemplaza el TextField de descripción con un TextArea
+            TextFormField(
               controller: _descripcionController,
               decoration: InputDecoration(labelText: 'Descripción de la Tarea'),
+              maxLines: null, // Permite múltiples líneas de texto
             ),
             // Campo de fecha de finalización con botón para abrir el selector
             Row(

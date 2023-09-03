@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:polismart_project/models/materia.dart';
 import 'package:polismart_project/services/firebase_tareas.dart';
 import 'package:polismart_project/services/firebase_deleteMateria.dart';
 import 'package:polismart_project/widgets/detalles.dart';

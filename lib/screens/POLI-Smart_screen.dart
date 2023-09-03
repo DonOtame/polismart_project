@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/screens/form_materia.dart';
+import 'package:polismart_project/widgets/horarios_widget.dart';
 import 'package:polismart_project/widgets/materia_content.dart';
+import 'package:polismart_project/widgets/material_widget.dart';
+import 'package:polismart_project/widgets/tareas_widget.dart';
 
 class PoliSmartScreen extends StatefulWidget {
   const PoliSmartScreen({Key? key});
@@ -55,15 +58,16 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
           ),
         ],
       ),
-      body:
-          _currentIndex == 0 // Mostrar el contenido en la página de "Materias"
-              ? buildMateriasContent()
-              : _buildEmptyPage(), // Otras páginas (por ahora vacías)
+      body: _currentIndex == 0
+          ? buildMateriasContent()
+          : _currentIndex == 1
+              ? buildHorarioContent()
+              : _currentIndex == 2
+                  ? buildTareasContent()
+                  : _currentIndex == 3
+                      ? buildMaterialesContent()
+                      : _buildEmptyPage(),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: const Color(0xFFD9CE9A),
-        unselectedItemColor: const Color(0xFFD9CE9A),
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.book), // Icono para Materias
@@ -73,16 +77,23 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.schedule), // Icono para Horarios
             label: 'Horarios',
+            backgroundColor: Color(0xFF0F2440),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment), // Icono para Tareas
             label: 'Tareas',
+            backgroundColor: Color(0xFF0F2440),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.attachment), // Icono para Material
             label: 'Material',
+            backgroundColor: Color(0xFF0F2440),
           ),
         ],
+        selectedItemColor: const Color(0xFFD9CE9A),
+        unselectedItemColor: const Color(0xFFD9CE9A),
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
       ),
     );
   }
