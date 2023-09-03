@@ -14,6 +14,7 @@ class DetalleMateriaScreen extends StatefulWidget {
 
 class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
   int _selectedIndex = 0; // Índice de la pestaña seleccionada
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,6 +194,7 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
                 .collection('materias')
                 .doc(widget.nombreMateria)
                 .collection('tareas')
+                .orderBy('estado', descending: false)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -222,7 +224,7 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
                   final descripcion = tarea['descripcion'] ?? '';
                   final fechaCreacion = tarea['fechaCreacion'] ?? '';
                   final fechaFin = tarea['fechaFin'] ?? '';
-                  final estado = tarea['estado'] ?? false;
+                  bool estado = tarea['estado'] ?? false;
 
                   // Agregar "Completada" a la descripción si la tarea está completa
                   final descripcionConEstado =
@@ -241,9 +243,29 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
                           Text('Fecha de Finalización: $fechaFin'),
                         ],
                       ),
-                      trailing: estado
-                          ? Icon(Icons.check_circle, color: Colors.green)
-                          : null,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.check_circle,
+                                color: estado ? Colors.green : Colors.grey),
+                            onPressed: () {
+                              // Cambiar el estado de la tarea (completa/incompleta)
+                              setState(() {
+                                estado = !estado;
+                                _actualizarEstadoTarea(tarea, estado);
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              // Eliminar la tarea
+                              _eliminarTarea(tarea);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -260,6 +282,16 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         ),
       ],
     );
+  }
+
+// Función para cambiar el estado de una tarea
+  void _actualizarEstadoTarea(DocumentSnapshot tarea, bool estado) {
+    tarea.reference.update({'estado': estado});
+  }
+
+// Función para eliminar una tarea
+  void _eliminarTarea(DocumentSnapshot tarea) {
+    tarea.reference.delete();
   }
 
   void _abrirFormTarea(BuildContext context) {
