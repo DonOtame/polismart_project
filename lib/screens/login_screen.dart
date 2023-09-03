@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:polismart_project/screens/POLI-Smart_screen.dart';
+import 'package:polismart_project/widgets/login_textfied.dart';
+import 'package:polismart_project/widgets/logo_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:polismart_project/providers/auth_provider.dart';
 
@@ -39,39 +41,6 @@ class _LoginScreenState extends State<LoginScreen> {
           SizedBox(height: 32.0),
           buildSignInButton(context, authProvider),
         ],
-      ),
-    );
-  }
-
-  Widget buildLogo() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Image.network(
-        'https://firebasestorage.googleapis.com/v0/b/polismart-6f6ee.appspot.com/o/logo.png?alt=media&token=10ca46a6-b6f8-4046-b8c0-457c1ee70bb6',
-        width: 200.0,
-        height: 200.0,
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    required IconData prefixIcon,
-    bool obscureText = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: labelText,
-          prefixIcon: Icon(prefixIcon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
-          ),
-        ),
-        obscureText: obscureText,
       ),
     );
   }
