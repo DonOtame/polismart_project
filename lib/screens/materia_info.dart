@@ -12,7 +12,7 @@ class DetalleMateriaScreen extends StatefulWidget {
 }
 
 class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 0; // Índice de la pestaña seleccionada
   bool _isDeleting = false;
 
   @override
@@ -22,15 +22,39 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         title: Text(
           widget.nombreMateria,
           style: TextStyle(
-            color: const Color(0xFFD9CE9A),
+            color: Color(0xFFD9CE9A),
           ),
         ),
         iconTheme: const IconThemeData(
-          color: const Color(0xFFD9CE9A),
+          color: Color(0xFFD9CE9A),
         ),
       ),
-      body: _buildBody(),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      body: _selectedIndex == 0
+          ? _buildDetalles() // Contenido de la pestaña Detalles
+          : _selectedIndex == 1
+              ? _buildTareas() // Contenido de la pestaña Tareas
+              : _buildMaterialClase(), // Contenido de la pestaña Material de Clase
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Color(0xFF0F2440),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.details),
+            label: 'Detalles',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'Tareas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.class_),
+            label: 'Material de Clase',
+          ),
+        ],
+        selectedItemColor: const Color(0xFFD9CE9A),
+        unselectedItemColor: const Color(0xFFD9CE9A),
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
       floatingActionButton: _isDeleting
           ? null
           : FloatingActionButton(
@@ -42,49 +66,14 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
     );
   }
 
-  Widget _buildBody() {
-    switch (_selectedIndex) {
-      case 0:
-        return _buildDetalles();
-      case 1:
-        return _buildTareas();
-      case 2:
-        return _buildMaterialClase();
-      default:
-        return Container(); // Puedes personalizar el caso por defecto
-    }
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      backgroundColor: const Color(0xFF0F2440),
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.details),
-          label: 'Detalles',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.assignment),
-          label: 'Tareas',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.class_),
-          label: 'Material de Clase',
-        ),
-      ],
-      selectedItemColor: const Color(0xFFD9CE9A),
-      unselectedItemColor: const Color(0xFFD9CE9A),
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
-    );
-  }
-
+  // Función para cambiar de pestaña al tocar un ítem en el BottomNavigationBar
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
+  // Implementa el contenido de la pestaña Detalles
   Widget _buildDetalles() {
     return FutureBuilder<Materia>(
       future: obtenerDetallesDeFirebase(widget.nombreMateria),
@@ -186,18 +175,23 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         throw Exception('La materia no fue encontrada');
       }
     } catch (e) {
+      // Manejo de errores, puedes personalizarlo según tus necesidades
       print('Error al obtener detalles de la materia: $e');
       throw e;
     }
   }
 
+  // Implementa el contenido de la pestaña Tareas
   Widget _buildTareas() {
+    // Contenido de la pestaña Tareas (puedes personalizarlo)
     return Center(
       child: Text('Contenido de la pestaña Tareas'),
     );
   }
 
+  // Implementa el contenido de la pestaña Material de Clase
   Widget _buildMaterialClase() {
+    // Contenido de la pestaña Material de Clase (puedes personalizarlo)
     return Center(
       child: Text('Contenido de la pestaña Material de Clase'),
     );
@@ -220,6 +214,7 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
             TextButton(
               child: Text('Eliminar'),
               onPressed: () async {
+                // Eliminar la materia de Firebase
                 try {
                   await FirebaseFirestore.instance
                       .collection('materias')
@@ -231,12 +226,14 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
                     });
                   });
 
+                  // Mostrar un SnackBar para confirmar la eliminación exitosa
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('La materia se ha eliminado con éxito'),
                     ),
                   );
 
+                  // Regresar a la pantalla anterior
                   Navigator.of(context).pop(true);
                 } catch (e) {
                   print('Error al eliminar la materia: $e');
@@ -250,6 +247,7 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
     );
 
     if (confirmDelete == true) {
+      // Regresar a la pantalla anterior si se confirmó la eliminación
       Navigator.of(context).pop();
     }
   }
