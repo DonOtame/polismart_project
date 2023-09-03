@@ -40,7 +40,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthProvider()),
-        // Puedes agregar otros providers aquí según sea necesario.
       ],
       child: MaterialApp(
         title: 'Polismart Project',
@@ -48,7 +47,6 @@ class MyApp extends StatelessWidget {
           primarySwatch: customPrimaryColor,
         ),
         home: LoginScreen(),
-        //home: PoliSmartScreen(),
       ),
     );
   }
