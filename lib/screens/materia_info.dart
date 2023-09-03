@@ -14,8 +14,6 @@ class DetalleMateriaScreen extends StatefulWidget {
 
 class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
   int _selectedIndex = 0; // Índice de la pestaña seleccionada
-  bool _isDeleting = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,6 +27,14 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         iconTheme: const IconThemeData(
           color: Color(0xFFD9CE9A),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              _confirmDeleteMateria(context);
+            },
+          ),
+        ],
       ),
       body: _selectedIndex == 0
           ? _buildDetalles() // Contenido de la pestaña Detalles
@@ -56,14 +62,6 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
-      floatingActionButton: _isDeleting
-          ? null
-          : FloatingActionButton(
-              onPressed: () {
-                _confirmDeleteMateria(context);
-              },
-              child: Icon(Icons.delete),
-            ),
     );
   }
 
@@ -184,20 +182,83 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
 
 // Implementa el contenido de la pestaña Tareas
   Widget _buildTareas(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Contenido de la pestaña Tareas'),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              _abrirFormTarea(context);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(height: 20),
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            // Escuchar cambios en la colección de tareas en tiempo real
+            stream: FirebaseFirestore.instance
+                .collection('materias')
+                .doc(widget.nombreMateria)
+                .collection('tareas')
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              }
+
+              // Si no hay datos o las tareas están vacías, mostrar un mensaje
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Center(
+                  child: Text('No hay tareas'),
+                );
+              }
+
+              // Si hay tareas, mostrar la lista de tareas
+              final tareas = snapshot.data!.docs;
+              return ListView.builder(
+                itemCount: tareas.length,
+                itemBuilder: (context, index) {
+                  final tarea = tareas[index];
+                  final titulo = tarea['titulo'] ?? '';
+                  final descripcion = tarea['descripcion'] ?? '';
+                  final fechaCreacion = tarea['fechaCreacion'] ?? '';
+                  final fechaFin = tarea['fechaFin'] ?? '';
+                  final estado = tarea['estado'] ?? false;
+
+                  // Agregar "Completada" a la descripción si la tarea está completa
+                  final descripcionConEstado =
+                      estado ? '$descripcion (Completada)' : descripcion;
+
+                  return Card(
+                    elevation: 3,
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: ListTile(
+                      title: Text(titulo),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Descripción: $descripcionConEstado'),
+                          Text('Fecha de Creación: $fechaCreacion'),
+                          Text('Fecha de Finalización: $fechaFin'),
+                        ],
+                      ),
+                      trailing: estado
+                          ? Icon(Icons.check_circle, color: Colors.green)
+                          : null,
+                    ),
+                  );
+                },
+              );
             },
-            child: Text('Agregar Tarea'),
           ),
-        ],
-      ),
+        ),
+        SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () {
+            _abrirFormTarea(context);
+          },
+          child: Text('Agregar Tarea'),
+        ),
+      ],
     );
   }
 
