@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:polismart_project/models/materia.dart';
 import 'package:polismart_project/services/firebase_tareas.dart';
 import 'package:polismart_project/services/firebase_deleteMateria.dart';
 import 'package:polismart_project/widgets/detalles.dart';
-import 'package:polismart_project/widgets/material.dart';
+import 'package:polismart_project/widgets/documentos.dart';
 import 'package:polismart_project/widgets/tareas.dart';
 
 class DetalleMateriaScreen extends StatefulWidget {
@@ -51,10 +50,10 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
               ? TareasWidget(
                   nombreMateria:
                       widget.nombreMateria) // Contenido de la pestaña Tareas
-              : buildMaterialClase(
+              : buildDocumentosClase(
                   context,
                   widget
-                      .nombreMateria), // Contenido de la pestaña Material de Clase
+                      .nombreMateria), // Contenido de la pestaña Documentos de Clase
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color(0xFF0F2440),
         items: const <BottomNavigationBarItem>[
@@ -68,7 +67,7 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.class_),
-            label: 'Material de Clase',
+            label: 'Documentos',
           ),
         ],
         selectedItemColor: const Color(0xFFD9CE9A),

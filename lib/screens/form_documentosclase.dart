@@ -5,24 +5,24 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/services/firebase_upload.dart';
 
-class FormMaterialClase extends StatefulWidget {
+class FormDocumentosClase extends StatefulWidget {
   final String nombreMateria;
 
-  FormMaterialClase({required this.nombreMateria});
+  FormDocumentosClase({required this.nombreMateria});
 
   @override
-  _FormMaterialClaseState createState() => _FormMaterialClaseState();
+  _FormDocumentosClaseState createState() => _FormDocumentosClaseState();
 }
 
-class _FormMaterialClaseState extends State<FormMaterialClase> {
+class _FormDocumentosClaseState extends State<FormDocumentosClase> {
   final TextEditingController _nombreController = TextEditingController();
-  String? _tipoMaterial;
+  String? _tipoDocumentos;
   String? _archivoNombre;
   File? _archivoSeleccionado;
   bool _subiendoArchivo = false;
   String? _mensajeResultado;
 
-  final List<String> _opcionesTipoMaterial = [
+  final List<String> _opcionesTipoDocumentos = [
     'Teoria',
     'Pruebas',
     'Tareas',
@@ -55,9 +55,9 @@ class _FormMaterialClaseState extends State<FormMaterialClase> {
         await _firestore
             .collection('materias')
             .doc(widget.nombreMateria)
-            .collection('material')
+            .collection('documentos')
             .add({
-          'tipo': _tipoMaterial,
+          'tipo': _tipoDocumentos,
           'titulo': _nombreController.text,
           'url': downloadURL,
         });
@@ -81,7 +81,7 @@ class _FormMaterialClaseState extends State<FormMaterialClase> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Agregar Material a ${widget.nombreMateria}'),
+        title: Text('Agregar Documentos a ${widget.nombreMateria}'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -89,9 +89,9 @@ class _FormMaterialClaseState extends State<FormMaterialClase> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownButtonFormField<String>(
-              value: _tipoMaterial,
-              decoration: InputDecoration(labelText: 'Tipo de Material'),
-              items: _opcionesTipoMaterial.map((tipo) {
+              value: _tipoDocumentos,
+              decoration: InputDecoration(labelText: 'Tipo de Documento'),
+              items: _opcionesTipoDocumentos.map((tipo) {
                 return DropdownMenuItem<String>(
                   value: tipo,
                   child: Text(tipo),
@@ -99,14 +99,14 @@ class _FormMaterialClaseState extends State<FormMaterialClase> {
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  _tipoMaterial = value;
+                  _tipoDocumentos = value;
                 });
               },
             ),
             SizedBox(height: 16.0),
             TextField(
               controller: _nombreController,
-              decoration: InputDecoration(labelText: 'Nombre del Material'),
+              decoration: InputDecoration(labelText: 'Nombre del Documento'),
             ),
             SizedBox(height: 16.0),
             ElevatedButton(

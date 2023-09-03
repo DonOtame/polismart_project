@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-Widget buildMaterialesContent() {
+Widget buildDocumentosContent() {
   return StreamBuilder<QuerySnapshot>(
     stream: FirebaseFirestore.instance.collection('materias').snapshots(),
     builder: (context, snapshot) {
@@ -42,8 +41,8 @@ Widget buildMaterialesContent() {
                     ),
                   ),
                 ),
-                buildMaterialesList(
-                  materias[index].reference.collection('material'),
+                buildDocumentosList(
+                  materias[index].reference.collection('documentos'),
                 ),
               ],
             ),
@@ -54,40 +53,40 @@ Widget buildMaterialesContent() {
   );
 }
 
-Widget buildMaterialesList(CollectionReference materialesCollection) {
+Widget buildDocumentosList(CollectionReference documentosCollection) {
   return StreamBuilder<QuerySnapshot>(
-    stream: materialesCollection.snapshots(),
-    builder: (context, materialesSnapshot) {
-      if (materialesSnapshot.hasError) {
+    stream: documentosCollection.snapshots(),
+    builder: (context, documentosSnapshot) {
+      if (documentosSnapshot.hasError) {
         return Center(
-          child: Text('Error: ${materialesSnapshot.error}'),
+          child: Text('Error: ${documentosSnapshot.error}'),
         );
       }
 
-      if (materialesSnapshot.connectionState == ConnectionState.waiting) {
+      if (documentosSnapshot.connectionState == ConnectionState.waiting) {
         return Center(
           child: CircularProgressIndicator(),
         );
       }
 
-      final List<QueryDocumentSnapshot> materialesDocs =
-          materialesSnapshot.data!.docs;
+      final List<QueryDocumentSnapshot> documentosDocs =
+          documentosSnapshot.data!.docs;
 
       return Column(
-        children: materialesDocs.map((materialDoc) {
-          final materialData = materialDoc.data() as Map<String, dynamic>;
-          final tipo = materialData['tipo'];
-          final titulo = materialData['titulo'];
-          final url = materialData['url'];
+        children: documentosDocs.map((documentoDoc) {
+          final documentoData = documentoDoc.data() as Map<String, dynamic>;
+          final tipo = documentoData['tipo'];
+          final titulo = documentoData['titulo'];
+          final url = documentoData['url'];
 
-          return buildMaterialCard(tipo, titulo, url);
+          return buildDocumentosCard(tipo, titulo, url);
         }).toList(),
       );
     },
   );
 }
 
-Widget buildMaterialCard(String tipo, String titulo, String url) {
+Widget buildDocumentosCard(String tipo, String titulo, String url) {
   // Define un mapa que mapea tipos a iconos
   Map<String, IconData> tipoIconos = {
     'Teoria': Icons.book,
@@ -138,7 +137,7 @@ Widget buildMaterialCard(String tipo, String titulo, String url) {
               _launchURL(url); // Llama a la función para abrir la URL
             },
             child: Text(
-              'Ver Material',
+              'Ver Documento',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.blue,

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/screens/form_materia.dart';
 import 'package:polismart_project/widgets/horarios_widget.dart';
 import 'package:polismart_project/widgets/materia_content.dart';
-import 'package:polismart_project/widgets/material_widget.dart';
+import 'package:polismart_project/widgets/documentos_widget.dart';
 import 'package:polismart_project/widgets/tareas_widget.dart';
 
 class PoliSmartScreen extends StatefulWidget {
@@ -65,7 +65,7 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
               : _currentIndex == 2
                   ? buildTareasContent()
                   : _currentIndex == 3
-                      ? buildMaterialesContent()
+                      ? buildDocumentosContent()
                       : _buildEmptyPage(),
       bottomNavigationBar: BottomNavigationBar(
         items: [
@@ -85,8 +85,8 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
             backgroundColor: Color(0xFF0F2440),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.attachment), // Icono para Material
-            label: 'Material',
+            icon: Icon(Icons.attachment), // Icono para Documentos
+            label: 'Documentos',
             backgroundColor: Color(0xFF0F2440),
           ),
         ],
@@ -98,7 +98,7 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
     );
   }
 
-  // Función para mostrar páginas vacías (para Horarios, Tareas y Material)
+  // Función para mostrar páginas vacías
   Widget _buildEmptyPage() {
     return Center(
       child: Text('Esta página está vacía.'),
