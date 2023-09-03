@@ -186,37 +186,6 @@ class PoliSmartScreen extends StatelessWidget {
           },
         ),
       ),
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.keyboard),
-            label: 'Teclado',
-            backgroundColor: Color(0xFF0F2440),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.mic),
-            label: 'Micrófono',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_enhance),
-            label: 'Cámara',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.check),
-            label: 'Visto',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.more_horiz),
-            label: 'Más',
-          ),
-        ],
-        selectedItemColor: const Color(0xFFD9CE9A),
-        unselectedItemColor: const Color(0xFFD9CE9A),
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-      ),
     );
   }
 }
