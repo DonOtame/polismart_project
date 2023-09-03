@@ -17,7 +17,7 @@ class _TareasWidgetState extends State<TareasWidget> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
@@ -28,18 +28,12 @@ class _TareasWidgetState extends State<TareasWidget> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
+                return const Center(
                   child: CircularProgressIndicator(),
                 );
               } else if (snapshot.hasError) {
                 return Center(
                   child: Text('Error: ${snapshot.error}'),
-                );
-              }
-
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Center(
-                  child: Text('No hay tareas'),
                 );
               }
 
@@ -59,7 +53,8 @@ class _TareasWidgetState extends State<TareasWidget> {
 
                   return Card(
                     elevation: 3,
-                    margin: const EdgeInsets.all(16),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
                       title: Text(titulo),
                       subtitle: Column(
@@ -74,10 +69,8 @@ class _TareasWidgetState extends State<TareasWidget> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(
-                              Icons.check_circle,
-                              color: estado ? Colors.green : Colors.grey,
-                            ),
+                            icon: Icon(Icons.check_circle,
+                                color: estado ? Colors.green : Colors.grey),
                             onPressed: () {
                               setState(() {
                                 estado = !estado;
@@ -86,10 +79,7 @@ class _TareasWidgetState extends State<TareasWidget> {
                             },
                           ),
                           IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: Colors.red,
-                            ),
+                            icon: Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
                               _eliminarTarea(tarea);
                             },
@@ -103,12 +93,12 @@ class _TareasWidgetState extends State<TareasWidget> {
             },
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         ElevatedButton(
           onPressed: () {
             _abrirFormTarea(context);
           },
-          child: Text('Agregar Tarea'),
+          child: const Text('Agregar Tarea'),
         ),
       ],
     );

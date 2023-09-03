@@ -21,12 +21,6 @@ class MaterialClaseList extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
         }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(
-            child: Text('No hay materiales de clase disponibles.'),
-          );
-        }
-
         final materials = snapshot.data!.docs;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,8 +69,8 @@ class MaterialClaseCard extends StatelessWidget {
         onTap: () async {
           final urlToLaunch = Uri.tryParse(url);
           if (urlToLaunch != null && urlToLaunch.isAbsolute) {
-            if (await canLaunch(urlToLaunch.toString())) {
-              await launch(urlToLaunch.toString());
+            if (await canLaunchUrl(urlToLaunch)) {
+              await launchUrl(urlToLaunch);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
