@@ -14,42 +14,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
       GlobalKey<ScaffoldMessengerState>();
 
-  void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _signIn(BuildContext context, AuthProvider authProvider) async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-    if (email.isNotEmpty && password.isNotEmpty) {
-      try {
-        await authProvider.signInWithEmailAndPassword(email, password);
-        final authStatus = authProvider.authStatus;
-        if (authStatus == AuthStatus.Success) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => PoliSmartScreen(),
-            ),
-          );
-          _showSnackBar(context, 'Inicio de sesión exitoso');
-        } else if (authStatus == AuthStatus.Error) {
-          _showSnackBar(
-            context,
-            'Error al iniciar sesión. Comprueba tus credenciales.',
-          );
-        }
-      } catch (e) {
-        _showSnackBar(
-            context, 'Error al iniciar sesión. Comprueba tus credenciales.');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -124,5 +88,41 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _signIn(BuildContext context, AuthProvider authProvider) async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    if (email.isNotEmpty && password.isNotEmpty) {
+      try {
+        await authProvider.signInWithEmailAndPassword(email, password);
+        final authStatus = authProvider.authStatus;
+        if (authStatus == AuthStatus.Success) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => PoliSmartScreen(),
+            ),
+          );
+          _showSnackBar(context, 'Inicio de sesión exitoso');
+        } else if (authStatus == AuthStatus.Error) {
+          _showSnackBar(
+            context,
+            'Error al iniciar sesión. Comprueba tus credenciales.',
+          );
+        }
+      } catch (e) {
+        _showSnackBar(
+            context, 'Error al iniciar sesión. Comprueba tus credenciales.');
+      }
+    }
   }
 }
