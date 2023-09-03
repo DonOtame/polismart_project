@@ -1,9 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:polismart_project/screens/form_materia.dart';
-import 'package:polismart_project/widgets/materia_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PoliSmartScreen extends StatelessWidget {
-  const PoliSmartScreen({super.key});
+  const PoliSmartScreen({Key? key});
+
+  Color getColorFromFirebaseString(String colorString) {
+    final match = RegExp(r'0x([0-9a-fA-F]+)').firstMatch(colorString);
+    if (match != null) {
+      final hexColor =
+          match.group(1); // Usar el grupo 1 para obtener el valor hexadecimal
+      final int? colorValue = int.tryParse(hexColor!, radix: 16);
+      if (colorValue != null) {
+        return Color(colorValue);
+      }
+    }
+    // Valor predeterminado en caso de que no se pueda analizar el color.
+    return Colors.green;
+  }
+
+  Future<void> fetchDataFromFirestore() async {
+    final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('materias') // Reemplaza con el nombre de tu colección
+        .get();
+
+    // Itera a través de los documentos y muestra los datos en la consola
+    querySnapshot.docs.forEach((document) {
+      print(document.data());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,9 +113,83 @@ class PoliSmartScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: MateriasList(),
-      extendBodyBehindAppBar: true, // Extiende el contenido detrás del AppBar.
-      extendBody: true, // Extiende el contenido detrás del AppBar.
+      body: SingleChildScrollView(
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('materias').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Dos tarjetas por fila
+              ),
+              itemCount: documents.length,
+              itemBuilder: (context, index) {
+                final data = documents[index].data() as Map<String, dynamic>;
+                final nombre = data['nombre'];
+                final colorString = data['color']; // Obtén el color como cadena
+                final color = getColorFromFirebaseString(
+                    colorString); // Convierte la cadena en un Color
+
+                return InkWell(
+                  onTap: () {
+                    // Definir la acción que deseas realizar al tocar una tarjeta
+                    print('Tocaste la tarjeta $nombre');
+                  },
+                  child: Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.all(10),
+                    child: AspectRatio(
+                      aspectRatio: 3.0 / 4.0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.book,
+                              size: 64.0,
+                              color: color, // Usa el color obtenido de Firebase
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              nombre,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+      extendBodyBehindAppBar: true,
+      extendBody: true,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -116,48 +215,10 @@ class PoliSmartScreen extends StatelessWidget {
           ),
         ],
         selectedItemColor: const Color(0xFFD9CE9A),
-        unselectedItemColor:
-            const Color(0xFFD9CE9A), // Color de los íconos no seleccionados.
-        showSelectedLabels:
-            false, // Oculta las etiquetas de los íconos seleccionados.
-        showUnselectedLabels:
-            false, // Oculta las etiquetas de los íconos no seleccionados.
+        unselectedItemColor: const Color(0xFFD9CE9A),
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
       ),
-    );
-  }
-}
-
-class MateriasList extends StatelessWidget {
-  final List<Map<String, dynamic>> materias = [
-    {'nombre': 'Matemáticas', 'color': Colors.blue},
-    {'nombre': 'Ciencias', 'color': Colors.red},
-    {'nombre': 'Historia', 'color': Colors.green},
-    {'nombre': 'Geografía', 'color': Colors.orange},
-    {'nombre': 'Arte', 'color': Colors.purple},
-    {'nombre': 'Educación Física', 'color': Colors.teal},
-    // Agrega más materias con colores aquí
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: (materias.length / 2).ceil(),
-      itemBuilder: (context, index) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            MateriaCard(
-              nombre: materias[index * 2]['nombre'],
-              iconColor: materias[index * 2]['color'],
-            ),
-            if ((index * 2 + 1) < materias.length)
-              MateriaCard(
-                nombre: materias[index * 2 + 1]['nombre'],
-                iconColor: materias[index * 2 + 1]['color'],
-              ),
-          ],
-        );
-      },
     );
   }
 }
