@@ -150,7 +150,6 @@ class PoliSmartScreen extends StatelessWidget {
                   onTap: () {
                     // Realiza la acción que desees al tocar la tarjeta
                     print('Tocaste la tarjeta $nombre');
-                    // Puedes abrir la pantalla de detalles aquí si lo deseas
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) =>
