@@ -30,11 +30,13 @@ Widget buildDetalles(Future<Materia> futureMateria) {
 
       return Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: detalles.entries.map((entry) {
-            return buildDetalleTile(entry.key, entry.value);
-          }).toList(),
+        child: ListView.builder(
+          itemCount: detalles.length,
+          itemBuilder: (context, index) {
+            final key = detalles.keys.elementAt(index);
+            final value = detalles[key];
+            return buildDetalleTile(key, value!);
+          },
         ),
       );
     },
