@@ -6,7 +6,7 @@ Widget buildDetalles(Future<Materia> futureMateria) {
     future: futureMateria,
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(
+        return const Center(
           child: CircularProgressIndicator(),
         );
       } else if (snapshot.hasError) {
@@ -45,14 +45,14 @@ Widget buildDetalleTile(String title, String subtitle) {
   return ListTile(
     title: Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 20,
       ),
     ),
     subtitle: Text(
       subtitle,
-      style: TextStyle(fontSize: 18),
+      style: const TextStyle(fontSize: 18),
     ),
   );
 }
