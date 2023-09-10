@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:polismart_project/services/firebase_deleteMateria.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class DocumentoClaseList extends StatelessWidget {
@@ -18,7 +18,7 @@ class DocumentoClaseList extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
@@ -40,6 +40,8 @@ class DocumentoClaseList extends StatelessWidget {
                   tipo: tipo,
                   titulo: titulo,
                   url: url,
+                  nombreMateria: nombreMateria,
+                  context: context, // Pasa el contexto
                 );
               },
             ),
@@ -54,24 +56,31 @@ class MaterialClaseCard extends StatelessWidget {
   final String tipo;
   final String titulo;
   final String url;
+  final String nombreMateria;
+  final BuildContext context; // Agrega el campo de contexto
 
   MaterialClaseCard({
     required this.tipo,
     required this.titulo,
     required this.url,
+    required this.nombreMateria,
+    required this.context, // Recibe el contexto
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 3,
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: InkWell(
         onTap: () async {
           final urlToLaunch = Uri.tryParse(url);
           if (urlToLaunch != null && urlToLaunch.isAbsolute) {
-            if (await canLaunch(urlToLaunch.toString())) {
-              await launch(urlToLaunch.toString());
+            if (await canLaunchUrlString(urlToLaunch.toString())) {
+              await launchUrlString(urlToLaunch.toString());
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -88,7 +97,7 @@ class MaterialClaseCard extends StatelessWidget {
           }
         },
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -96,58 +105,81 @@ class MaterialClaseCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tipo: $tipo',
-                    style: TextStyle(
+                    tipo,
+                    style: const TextStyle(
                       fontSize: 16,
-                      color: Colors.black,
+                      color: Color(0xFF0F2440),
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   Icon(
                     tipoIconos.containsKey(tipo)
                         ? tipoIconos[tipo]
                         : Icons.folder,
-                    color: Colors.blue,
+                    color: const Color(0xFF0F2440),
+                    size: 24,
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
               Text(
-                'Título: $titulo',
-                style: TextStyle(
+                titulo,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
                 ),
               ),
-              SizedBox(height: 8),
-              TextButton(
-                onPressed: () async {
-                  final urlToLaunch = Uri.tryParse(url);
-                  if (urlToLaunch != null && urlToLaunch.isAbsolute) {
-                    if (await canLaunch(urlToLaunch.toString())) {
-                      await launch(urlToLaunch.toString());
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('No se puede abrir el enlace: $url'),
-                        ),
-                      );
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('El URL no es válido: $url'),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      final urlToLaunch = Uri.tryParse(url);
+                      if (urlToLaunch != null && urlToLaunch.isAbsolute) {
+                        if (await canLaunchUrlString(urlToLaunch.toString())) {
+                          await launchUrlString(urlToLaunch.toString());
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('No se puede abrir el enlace: $url'),
+                            ),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('El URL no es válido: $url'),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text(
+                      'Ver Documento',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF0F2440),
+                        decoration: TextDecoration.underline,
                       ),
-                    );
-                  }
-                },
-                child: Text(
-                  'Ver Documento',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.blue,
-                    decoration: TextDecoration.underline,
+                    ),
                   ),
-                ),
+                  ElevatedButton(
+                    onPressed: () {
+                      eliminarMaterial(context, nombreMateria, url);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    child: const Text(
+                      'Eliminar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -157,15 +189,6 @@ class MaterialClaseCard extends StatelessWidget {
   }
 }
 
-void _launchURL(String url) async {
-  if (await canLaunchUrlString(url)) {
-    await launchUrlString(url);
-  } else {
-    throw 'No se pudo abrir la URL: $url';
-  }
-}
-
-// Define un mapa que mapea tipos a iconos
 Map<String, IconData> tipoIconos = {
   'Teoria': Icons.book,
   'Pruebas': Icons.assignment,
