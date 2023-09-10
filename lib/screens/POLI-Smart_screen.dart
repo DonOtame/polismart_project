@@ -21,19 +21,45 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
     });
   }
 
+  final List<Widget> _pages = [
+    buildMateriasContent(),
+    buildHorarioContent(),
+    buildTareasContent(),
+    buildDocumentosContent(),
+  ];
+
+  final List<BottomNavigationBarItem> _bottomNavBarItems = const [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.book),
+      label: 'Materias',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.schedule),
+      label: 'Horarios',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.assignment),
+      label: 'Tareas',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.attachment),
+      label: 'Documentos',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'POLI-Smart',
-          style: TextStyle(color: const Color(0xFFD9CE9A)),
+          style: TextStyle(color: Color(0xFFD9CE9A)),
         ),
         actions: [
           IconButton(
             icon: const Icon(
               Icons.add,
-              color: const Color(0xFFD9CE9A),
+              color: Color(0xFFD9CE9A),
             ),
             onPressed: () {
               Navigator.of(context).push(
@@ -45,49 +71,19 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
           ),
         ],
       ),
-      body: _currentIndex == 0
-          ? buildMateriasContent()
-          : _currentIndex == 1
-              ? buildHorarioContent()
-              : _currentIndex == 2
-                  ? buildTareasContent()
-                  : _currentIndex == 3
-                      ? buildDocumentosContent()
-                      : _buildEmptyPage(),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Materias',
-            backgroundColor: Color(0xFF0F2440),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.schedule),
-            label: 'Horarios',
-            backgroundColor: Color(0xFF0F2440),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Tareas',
-            backgroundColor: Color(0xFF0F2440),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attachment),
-            label: 'Documentos',
-            backgroundColor: Color(0xFF0F2440),
-          ),
-        ],
-        selectedItemColor: const Color(0xFFD9CE9A),
-        unselectedItemColor: const Color(0xFFD9CE9A),
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
+      body: _pages[_currentIndex],
+      bottomNavigationBar: Theme(
+        data: ThemeData(
+          canvasColor: const Color(0xFF0F2440),
+        ),
+        child: BottomNavigationBar(
+          items: _bottomNavBarItems,
+          selectedItemColor: const Color(0xFFD9CE9A),
+          unselectedItemColor: const Color(0xFFD9CE9A),
+          currentIndex: _currentIndex,
+          onTap: _onTabTapped,
+        ),
       ),
-    );
-  }
-
-  Widget _buildEmptyPage() {
-    return const Center(
-      child: Text('Esta página está vacía.'),
     );
   }
 }
