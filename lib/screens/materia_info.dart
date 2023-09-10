@@ -6,7 +6,7 @@ import 'package:polismart_project/widgets/documentos.dart';
 import 'package:polismart_project/widgets/tareas.dart';
 
 class DetalleMateriaScreen extends StatefulWidget {
-  final String nombreMateria;
+  late final String nombreMateria;
 
   DetalleMateriaScreen({required this.nombreMateria});
 
@@ -15,7 +15,7 @@ class DetalleMateriaScreen extends StatefulWidget {
 }
 
 class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
-  int _selectedIndex = 0; // Índice de la pestaña seleccionada
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         title: Text(
           widget.nombreMateria,
           style: TextStyle(
-            color: Color(0xFFD9CE9A),
+            color: const Color(0xFFD9CE9A),
           ),
         ),
         iconTheme: const IconThemeData(
@@ -32,7 +32,7 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete),
+            icon: const Icon(Icons.delete),
             onPressed: () async {
               final confirmacionEliminacion =
                   await confirmDeleteMateria(context, widget.nombreMateria);
@@ -43,42 +43,48 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
           ),
         ],
       ),
-      body: _selectedIndex == 0
-          ? buildDetalles(obtenerDetallesDeFirebase(
-              widget.nombreMateria)) // Contenido de la pestaña Detalles
-          : _selectedIndex == 1
-              ? TareasWidget(
-                  nombreMateria:
-                      widget.nombreMateria) // Contenido de la pestaña Tareas
-              : buildDocumentosClase(
-                  context,
-                  widget
-                      .nombreMateria), // Contenido de la pestaña Documentos de Clase
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF0F2440),
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.details),
-            label: 'Detalles',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Tareas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.class_),
-            label: 'Documentos',
-          ),
-        ],
-        selectedItemColor: const Color(0xFFD9CE9A),
-        unselectedItemColor: const Color(0xFFD9CE9A),
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
+      body: _buildBody(),
+      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
-  // Función para cambiar de pestaña al tocar un ítem en el BottomNavigationBar
+  Widget _buildBody() {
+    switch (_selectedIndex) {
+      case 0:
+        return buildDetalles(obtenerDetallesDeFirebase(widget.nombreMateria));
+      case 1:
+        return TareasWidget(nombreMateria: widget.nombreMateria);
+      case 2:
+        return buildDocumentosClase(context, widget.nombreMateria);
+      default:
+        return Container();
+    }
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      backgroundColor: const Color(0xFF0F2440),
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.details),
+          label: 'Detalles',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.assignment),
+          label: 'Tareas',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.class_),
+          label: 'Documentos',
+        ),
+      ],
+      selectedItemColor: const Color(0xFFD9CE9A),
+      unselectedItemColor: const Color(0xFFD9CE9A),
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+    );
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
