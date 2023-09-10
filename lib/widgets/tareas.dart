@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:polismart_project/models/tarea.dart';
 import 'package:polismart_project/screens/form_tarea.dart';
 
 class TareasWidget extends StatefulWidget {
@@ -38,56 +39,22 @@ class _TareasWidgetState extends State<TareasWidget> {
               }
 
               final tareas = snapshot.data!.docs;
+              final listaTareas = tareas
+                  .map((tarea) => Tarea(
+                        titulo: tarea['titulo'] ?? '',
+                        descripcion: tarea['descripcion'] ?? '',
+                        fechaCreacion: tarea['fechaCreacion'] ?? '',
+                        fechaFin: tarea['fechaFin'] ?? '',
+                        estado: tarea['estado'] ?? false,
+                      ))
+                  .toList();
+
               return ListView.builder(
-                itemCount: tareas.length,
+                itemCount: listaTareas.length,
                 itemBuilder: (context, index) {
-                  final tarea = tareas[index];
-                  final titulo = tarea['titulo'] ?? '';
-                  final descripcion = tarea['descripcion'] ?? '';
-                  final fechaCreacion = tarea['fechaCreacion'] ?? '';
-                  final fechaFin = tarea['fechaFin'] ?? '';
-                  bool estado = tarea['estado'] ?? false;
+                  final tarea = listaTareas[index];
 
-                  final descripcionConEstado =
-                      estado ? '$descripcion (Completada)' : descripcion;
-
-                  return Card(
-                    elevation: 3,
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: ListTile(
-                      title: Text(titulo),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Descripción: $descripcionConEstado'),
-                          Text('Fecha de Creación: $fechaCreacion'),
-                          Text('Fecha de Finalización: $fechaFin'),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.check_circle,
-                                color: estado ? Colors.green : Colors.grey),
-                            onPressed: () {
-                              setState(() {
-                                estado = !estado;
-                                _actualizarEstadoTarea(tarea, estado);
-                              });
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              _eliminarTarea(tarea);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return construirTareaCard(tarea);
                 },
               );
             },
@@ -104,8 +71,52 @@ class _TareasWidgetState extends State<TareasWidget> {
     );
   }
 
-  void _eliminarTarea(DocumentSnapshot tarea) {
-    tarea.reference.delete();
+  Widget construirTareaCard(Tarea tarea) {
+    return Card(
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ListTile(
+        title: Text(tarea.titulo),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+                'Descripción: ${tarea.estado ? "${tarea.descripcion} (Completada)" : tarea.descripcion}'),
+            Text('Fecha de Creación: ${tarea.fechaCreacion}'),
+            Text('Fecha de Finalización: ${tarea.fechaFin}'),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(Icons.check_circle,
+                  color: tarea.estado ? Colors.green : Colors.grey),
+              onPressed: () {
+                setState(() {
+                  _actualizarEstadoTarea(tarea, !tarea.estado);
+                });
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                _eliminarTarea(tarea.titulo);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _eliminarTarea(String tituloTarea) {
+    FirebaseFirestore.instance
+        .collection('materias')
+        .doc(widget.nombreMateria)
+        .collection('tareas')
+        .doc(tituloTarea)
+        .delete();
   }
 
   void _abrirFormTarea(BuildContext context) {
@@ -116,7 +127,12 @@ class _TareasWidgetState extends State<TareasWidget> {
     );
   }
 
-  void _actualizarEstadoTarea(DocumentSnapshot tarea, bool estado) {
-    tarea.reference.update({'estado': estado});
+  void _actualizarEstadoTarea(Tarea tarea, bool estado) {
+    FirebaseFirestore.instance
+        .collection('materias')
+        .doc(widget.nombreMateria)
+        .collection('tareas')
+        .doc(tarea.titulo)
+        .update({'estado': estado});
   }
 }
