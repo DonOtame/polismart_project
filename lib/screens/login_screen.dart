@@ -5,28 +5,33 @@ import 'package:polismart_project/widgets/logo_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:polismart_project/providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
-      GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-
     return Scaffold(
-      key: _scaffoldKey,
       body: ListView(
+        padding: const EdgeInsets.all(20.0),
         children: [
           SizedBox(height: 20.0),
           buildLogo(),
           SizedBox(height: 20.0),
+          buildForm(context),
+          SizedBox(height: 32.0),
+          buildSignInButton(context),
+        ],
+      ),
+    );
+  }
+
+  Widget buildForm(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
           buildTextField(
             controller: emailController,
             labelText: 'Correo electrónico',
@@ -38,18 +43,16 @@ class _LoginScreenState extends State<LoginScreen> {
             prefixIcon: Icons.lock,
             obscureText: true,
           ),
-          SizedBox(height: 32.0),
-          buildSignInButton(context, authProvider),
         ],
       ),
     );
   }
 
-  Widget buildSignInButton(BuildContext context, AuthProvider authProvider) {
+  Widget buildSignInButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton(
-        onPressed: () => _signIn(context, authProvider),
+        onPressed: () => _signIn(context),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF0F2440),
           padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -76,15 +79,18 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 1),
       ),
     );
   }
 
-  void _signIn(BuildContext context, AuthProvider authProvider) async {
+  Future<void> _signIn(BuildContext context) async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
-    if (email.isNotEmpty && password.isNotEmpty) {
+
+    if (_formKey.currentState!.validate()) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
       try {
         await authProvider.signInWithEmailAndPassword(email, password);
         final authStatus = authProvider.authStatus;
