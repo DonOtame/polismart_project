@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/screens/form_materia.dart';
 import 'package:polismart_project/widgets/horarios_widget.dart';
 import 'package:polismart_project/widgets/materia_content.dart';
@@ -16,19 +15,9 @@ class PoliSmartScreen extends StatefulWidget {
 class _PoliSmartScreenState extends State<PoliSmartScreen> {
   int _currentIndex = 0;
 
-  // Función para cambiar la página actual
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
-    });
-  }
-
-  Future<void> fetchDataFromFirestore() async {
-    final QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('materias').get();
-
-    querySnapshot.docs.forEach((document) {
-      print(document.data());
     });
   }
 
@@ -38,9 +27,7 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
       appBar: AppBar(
         title: const Text(
           'POLI-Smart',
-          style: TextStyle(
-            color: const Color(0xFFD9CE9A),
-          ),
+          style: TextStyle(color: const Color(0xFFD9CE9A)),
         ),
         actions: [
           IconButton(
@@ -68,24 +55,24 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
                       ? buildDocumentosContent()
                       : _buildEmptyPage(),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.book), // Icono para Materias
+            icon: Icon(Icons.book),
             label: 'Materias',
             backgroundColor: Color(0xFF0F2440),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.schedule), // Icono para Horarios
+            icon: Icon(Icons.schedule),
             label: 'Horarios',
             backgroundColor: Color(0xFF0F2440),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.assignment), // Icono para Tareas
+            icon: Icon(Icons.assignment),
             label: 'Tareas',
             backgroundColor: Color(0xFF0F2440),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.attachment), // Icono para Documentos
+            icon: Icon(Icons.attachment),
             label: 'Documentos',
             backgroundColor: Color(0xFF0F2440),
           ),
@@ -98,9 +85,8 @@ class _PoliSmartScreenState extends State<PoliSmartScreen> {
     );
   }
 
-  // Función para mostrar páginas vacías
   Widget _buildEmptyPage() {
-    return Center(
+    return const Center(
       child: Text('Esta página está vacía.'),
     );
   }
