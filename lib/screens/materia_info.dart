@@ -23,8 +23,8 @@ class _DetalleMateriaScreenState extends State<DetalleMateriaScreen> {
       appBar: AppBar(
         title: Text(
           widget.nombreMateria,
-          style: TextStyle(
-            color: const Color(0xFFD9CE9A),
+          style: const TextStyle(
+            color: Color(0xFFD9CE9A),
           ),
         ),
         iconTheme: const IconThemeData(
