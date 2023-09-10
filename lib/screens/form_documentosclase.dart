@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polismart_project/services/firebase_upload.dart';
 
@@ -29,7 +28,6 @@ class _FormDocumentosClaseState extends State<FormDocumentosClase> {
     'Formulario'
   ];
 
-  final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void _seleccionarArchivo() async {
