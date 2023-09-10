@@ -6,46 +6,40 @@ Widget buildDocumentosContent() {
   return StreamBuilder<QuerySnapshot>(
     stream: FirebaseFirestore.instance.collection('materias').snapshots(),
     builder: (context, snapshot) {
-      if (snapshot.hasError) {
-        return Center(
-          child: Text('Error: ${snapshot.error}'),
-        );
+      if (snapshot.hasError ||
+          snapshot.connectionState == ConnectionState.waiting) {
+        return buildLoadingErrorWidget(snapshot);
       }
 
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      }
-
-      final List<QueryDocumentSnapshot> materias = snapshot.data!.docs;
+      final materiasDocs = snapshot.data!.docs;
 
       return ListView.builder(
-        itemCount: materias.length,
+        itemCount: materiasDocs.length,
         itemBuilder: (context, index) {
-          final materiaData = materias[index].data() as Map<String, dynamic>;
-          final nombreMateria = materiaData['nombre'];
+          final materiaData =
+              materiasDocs[index].data() as Map<String, dynamic>;
+          final materiaNombre = materiaData['nombre'];
 
-          return Card(
-            elevation: 3,
-            margin: const EdgeInsets.all(10),
-            child: Column(
-              children: [
-                ListTile(
-                  title: Text(
-                    nombreMateria,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                buildDocumentosList(
-                  materias[index].reference.collection('documentos'),
-                ),
-              ],
-            ),
+          final documentosCollection =
+              materiasDocs[index].reference.collection('documentos');
+
+          return StreamBuilder<QuerySnapshot>(
+            stream: documentosCollection.snapshots(),
+            builder: (context, documentosSnapshot) {
+              if (documentosSnapshot.hasError ||
+                  documentosSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                return Container();
+              }
+
+              final documentosDocs = documentosSnapshot.data!.docs;
+
+              if (documentosDocs.isEmpty) {
+                return Container();
+              }
+
+              return buildMateriaCard(materiaNombre, documentosCollection);
+            },
           );
         },
       );
@@ -53,30 +47,49 @@ Widget buildDocumentosContent() {
   );
 }
 
+Widget buildMateriaCard(
+    String materiaNombre, CollectionReference documentosCollection) {
+  return Card(
+    elevation: 3,
+    margin: const EdgeInsets.all(10),
+    child: Column(
+      children: [
+        ListTile(
+          title: Text(
+            materiaNombre,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        buildDocumentosList(documentosCollection),
+      ],
+    ),
+  );
+}
+
 Widget buildDocumentosList(CollectionReference documentosCollection) {
   return StreamBuilder<QuerySnapshot>(
     stream: documentosCollection.snapshots(),
     builder: (context, documentosSnapshot) {
-      if (documentosSnapshot.hasError) {
-        return Center(
-          child: Text('Error: ${documentosSnapshot.error}'),
-        );
+      if (documentosSnapshot.hasError ||
+          documentosSnapshot.connectionState == ConnectionState.waiting) {
+        return buildLoadingErrorWidget(documentosSnapshot);
       }
 
-      if (documentosSnapshot.connectionState == ConnectionState.waiting) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      }
+      final documentosDocs = documentosSnapshot.data!.docs;
 
-      final List<QueryDocumentSnapshot> documentosDocs =
-          documentosSnapshot.data!.docs;
+      if (documentosDocs.isEmpty) {
+        return const Center(child: Text('No hay documentos disponibles.'));
+      }
 
       return Column(
         children: documentosDocs.map((documentoDoc) {
           final documentoData = documentoDoc.data() as Map<String, dynamic>;
           final tipo = documentoData['tipo'];
-          final titulo = documentoData['titulo'];
+          final titulo = documentoData['titulo'] ?? 'Sin título';
           final url = documentoData['url'];
 
           return buildDocumentosCard(tipo, titulo, url);
@@ -86,18 +99,23 @@ Widget buildDocumentosList(CollectionReference documentosCollection) {
   );
 }
 
+Widget buildLoadingErrorWidget(AsyncSnapshot<QuerySnapshot> snapshot) {
+  return Center(
+    child: snapshot.hasError
+        ? Text('Error: ${snapshot.error}')
+        : const CircularProgressIndicator(),
+  );
+}
+
 Widget buildDocumentosCard(String tipo, String titulo, String url) {
-  // Define un mapa que mapea tipos a iconos
-  Map<String, IconData> tipoIconos = {
+  final tipoIconos = {
     'Teoria': Icons.book,
     'Pruebas': Icons.assignment,
     'Tareas': Icons.assignment_turned_in,
     'Formulario': Icons.folder,
   };
 
-  // Obtén el icono correspondiente al tipo o utiliza uno predeterminado
-  IconData? icono =
-      tipoIconos.containsKey(tipo) ? tipoIconos[tipo] : Icons.folder;
+  final icono = tipoIconos[tipo] ?? Icons.folder;
 
   return Card(
     elevation: 3,
@@ -108,39 +126,43 @@ Widget buildDocumentosCard(String tipo, String titulo, String url) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Tipo: $tipo',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
-              ),
               Icon(
                 icono,
-                color: Colors.blue, // Color del icono
+                color: const Color(0xFF0F2440),
+                size: 32,
+              ),
+              const SizedBox(width: 16),
+              Text(
+                'Tipo: $tipo',
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
+          const SizedBox(height: 12),
           Text(
             'Título: $titulo',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            style: const TextStyle(
+              fontSize: 22,
               color: Colors.black,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 8),
-          TextButton(
-            onPressed: () {
-              _launchURL(url); // Llama a la función para abrir la URL
-            },
-            child: Text(
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => _launchURL(url),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFF0F2440),
+            ),
+            child: const Text(
               'Ver Documento',
               style: TextStyle(
-                fontSize: 16,
-                color: Colors.blue,
+                fontSize: 18,
                 decoration: TextDecoration.underline,
               ),
             ),
